@@ -126,6 +126,7 @@ public class FragmentYesterday extends Fragment {
             System.out.println(cal.getTime());
 
 
+
              date = format1.format(cal.getTime());
             System.out.println(date);
 
