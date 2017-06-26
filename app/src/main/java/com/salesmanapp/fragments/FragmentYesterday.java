@@ -125,7 +125,7 @@ public class FragmentYesterday extends Fragment {
             SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
             System.out.println(cal.getTime());
 
-            
+
 
 
              date = format1.format(cal.getTime());
