@@ -10,20 +10,11 @@ public class AllKeys {
 					+ "[a-zA-Z0-9][a-zA-Z0-9-]{0,64}" + "(" + "."
 					+ "[a-zA-Z0-9][a-zA-Z0-9-]{0,25}" + ")+");
 
-	public static final String URL_PINCODE_CHECK = "http://s.evahan.in/Traking/check_service";
-
-
-	public static final String URL_PINCODE_TRACKING = "http://s.evahan.in/Traking/Check_service/tracking?awbno=";
 
 
 
 
-	public static final String URL_CITYNAME_BY_PINCODE_CHECK = "https://www.whizapi.com/api/v2/util/ui/in/indian-city-by-postal-code?project-app-key=p75dteec5dvdymhkis18c5lk";
 
-	public static String TAG_PAYMENT_HASH_GENERATION="http://19designs.org/yelona/get_hash.php";
-
-	public static final String TAG_MOBILE_SLIDER_1="Mobile Slider One";
-	public static final String TAG_MOBILE_SLIDER_2="Mobile Slider Two";
 
 
     public static final boolean checkEmail(String email) {
@@ -32,7 +23,7 @@ public class AllKeys {
 	}
 
 
-	public static final String WEBSITE = "http://crm.tech9teen.com/Service.asmx/";
+	public static final String WEBSITE = "http://tech9teen.com/Service.asmx/";
 	//public static final String WEBSITE = "http://arham.dnsitexperts.com/yelona/index.php/welcome/";//http://demo1.dnsitexperts.com/
 	//public static final String WEBSITE = "http://19designs.org/yelona/index.php/welcome/";//http://demo1.dnsitexperts.com/
 
