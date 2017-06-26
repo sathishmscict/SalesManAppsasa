@@ -4,10 +4,10 @@ package com.salesmanapp.helper;
  * Created by SATHISH on 26-Jun-17.
  */
 
-public class myclass {
+public class myclassdemo {
     String name,id;
 
-    public myclass(String name, String id) {
+    public myclassdemo(String name, String id) {
         this.name = name;
         this.id = id;
     }
