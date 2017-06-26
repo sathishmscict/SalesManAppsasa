@@ -55,7 +55,8 @@ dependencies {
     }
 
 
-
+    // Realm
+    compile 'io.realm:realm-android:0.82.1'
 
 
 

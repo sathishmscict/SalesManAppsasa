@@ -1,7 +1,9 @@
 package com.salesmanapp.activity;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,6 +47,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.salesmanapp.R;
+import com.salesmanapp.adapter.FollowupDataAdapterRecyclerView;
 import com.salesmanapp.app.MyApplication;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.fragments.FragmentClients;
@@ -52,6 +55,8 @@ import com.salesmanapp.fragments.FragmentFollowup;
 import com.salesmanapp.fragments.FragmentHome;
 import com.salesmanapp.helper.AllKeys;
 import com.salesmanapp.helper.CustomRequest;
+import com.salesmanapp.helper.MyBroadcastReceiver;
+import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.services.MyLocationService;
 import com.salesmanapp.session.SessionManager;
 
@@ -64,7 +69,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
@@ -165,6 +174,9 @@ public class DashBoardActivity extends AppCompatActivity
                         public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
                     }).check();
 
+
+            setupLocalNotifications();
+
         }
 
 
@@ -233,6 +245,125 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
+    private void setupLocalNotifications() {
+
+
+
+
+
+
+            String query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID;
+            Log.d(TAG, " Query : " + query);
+
+            Cursor c = sd.rawQuery(query, null);
+
+            Log.d(TAG, "Client Records : " + c.getCount() + "  found");
+
+
+            if (c.getCount() > 0)
+            {
+                while (c.moveToNext())
+                {
+
+
+                    String notifytime = c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME));
+                    Log.d(TAG, "Time Before: " + notifytime);
+                    notifytime = notifytime.replace(" ", ":");
+                    Log.d(TAG, "Time After: " + notifytime);
+
+                    List<String> myTimeList = new ArrayList<String>(Arrays.asList(notifytime.split(":")));
+                    Log.d(TAG, "Time In List " + myTimeList.toString());
+
+                    Calendar calendar = Calendar.getInstance();
+
+                    calendar.set(Calendar.MINUTE, Integer.parseInt(myTimeList.get(1)));
+                    Log.d(TAG, "Alaram Minute :" + Integer.parseInt(myTimeList.get(1)));
+                    //   calendar.set(Calendar.SECOND, 00);
+                    if (myTimeList.get(2).toLowerCase().equals("am"))
+                    {
+
+                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                        Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                        // calendar.set(Calendar.AM_PM,Calendar.AM);
+                        Log.d(TAG, "Meridian AM");
+                        Log.d(TAG, "Meridian AM " + calendar.get(Calendar.AM_PM));
+                    } else {
+
+                        if (Integer.parseInt(myTimeList.get(0)) == 12) {
+                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                        } else {
+                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)) + 12);
+                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)) + 12);
+                        }
+
+                        //   calendar.set(Calendar.AM_PM,Calendar.PM);
+                        Log.d(TAG, "Meridian PM");
+                        Log.d(TAG, "Meridian PM " + calendar.get(Calendar.AM_PM));
+                    }
+                    //calendar.set(Calendar.AM_PM,calendar.get(Calendar.AM_PM));
+                    Log.d(TAG, "Meridian AMPM " + calendar.get(Calendar.AM_PM));
+
+                    //  alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 50000, AlarmManager.INTERVAL_DAY , pendingIntent);  //set repeating every 24 hours
+
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+                    calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+                    calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
+
+                    //Log.d(TAG , "Alarm set in " + calendar.getTimeInMillis() + " seconds, Alaram ID : "+(c.getInt(c.getColumnIndex(dbhandler.SUBTASK_ID))));
+
+                    Intent myIntent = new Intent(context, MyBroadcastReceiver.class);
+                    //  myIntent = new Intent(getActivity() , NotificationPublisher.class);
+
+                    Log.d(TAG, "Notification Data : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
+                    myIntent.putExtra("ALARAMID", String.valueOf(c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID))));
+
+                    Log.d(TAG, "Final Time in MilliSeconds : " + calendar.getTimeInMillis());
+                    myIntent.putExtra("SATISH", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)) + ",Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + calendar.getTimeInMillis());
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID)), myIntent, 0);
+
+                    //Log.d(TAG , " Time in Milli Seconds  "+AlarmManager.INTERVAL_DAY );
+
+                    //alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
+                    AlarmManager alarmManager = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+
+                                    /*long futureInMillis = SystemClock.elapsedRealtime() + calendar.getTimeInMillis();
+                                    Log.d(TAG, " Future MilliSeconds : " + futureInMillis);*/
+
+                    //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
+
+                    if(System.currentTimeMillis()  <= calendar.getTimeInMillis())
+                    {
+                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+
+                    }
+
+                    //alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+AlarmManager.INTERVAL_DAY,pendingIntent);
+                    //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+
+                    Log.d(TAG, "Alarm set in " + calendar.getTimeInMillis() + " seconds");
+
+                    calendar.clear();
+
+
+
+
+
+
+
+                }
+
+
+
+
+
+            }
+
+
+
+
+    }
 
 
     private void sendOrderDetailsToServer()

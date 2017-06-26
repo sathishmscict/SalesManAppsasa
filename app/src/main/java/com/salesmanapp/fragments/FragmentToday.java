@@ -159,6 +159,59 @@ public class FragmentToday extends android.support.v4.app.Fragment {
                 list_followups.add(followupData);
 
 
+            }
+
+
+            txtnodata.setVisibility(View.GONE);
+            rv_followup.setVisibility(View.VISIBLE);
+
+            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(getActivity(),list_followups,getActivity());
+            rv_followup.setAdapter(adapter);
+
+
+        }
+        else
+        {
+            Toast.makeText(getActivity(), "No client records found", Toast.LENGTH_SHORT).show();
+
+            txtnodata.setVisibility(View.VISIBLE);
+            rv_followup.setVisibility(View.GONE);
+        }
+
+
+    }
+
+  /*  private void FillDataOnRecyclerView()
+    {
+
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        ++month;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        String date = setCurrentDate(year,month,day);
+
+        String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + "";
+        query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID +" and fm."+ dbhandler.FOLLOWUP_DATE +"='"+ date +"'";
+        Log.d(TAG, " Query : " + query);
+
+        Cursor c = sd.rawQuery(query, null);
+
+        Log.d(TAG, "Client Records : " + c.getCount() + "  found");
+
+        list_followups.clear();
+        if (c.getCount() > 0)
+        {
+            while (c.moveToNext())
+            {
+                //FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude) {
+                FollowupData followupData = new FollowupData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ID)),c.getString(c.getColumnIndex("DevicType")),c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE1)),c.getString(c.getColumnIndex(dbhandler.CLIENT_BUSSINESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ADDRESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_NOTE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_EMAIL)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE2)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LANDLINE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_COMPANYNAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_TYPE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LATTITUDE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)));
+                //ClientData cd = new ClientData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)));
+                list_followups.add(followupData);
+
+
 
                 String notifytime = c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME));
                 Log.d(TAG, "Time Before: " + notifytime);
@@ -222,8 +275,8 @@ public class FragmentToday extends android.support.v4.app.Fragment {
                 //alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
                 AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
 
-                                    /*long futureInMillis = SystemClock.elapsedRealtime() + calendar.getTimeInMillis();
-                                    Log.d(TAG, " Future MilliSeconds : " + futureInMillis);*/
+                                    *//*long futureInMillis = SystemClock.elapsedRealtime() + calendar.getTimeInMillis();
+                                    Log.d(TAG, " Future MilliSeconds : " + futureInMillis);*//*
 
                 //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
 
@@ -266,7 +319,7 @@ public class FragmentToday extends android.support.v4.app.Fragment {
         }
 
 
-    }
+    }*/
 
 
 
