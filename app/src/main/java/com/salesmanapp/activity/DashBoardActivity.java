@@ -245,7 +245,8 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
-    private void setupLocalNotifications() {
+    private void setupLocalNotifications()
+    {
 
 
 
@@ -319,8 +320,14 @@ public class DashBoardActivity extends AppCompatActivity
                     Log.d(TAG, "Notification Data : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
                     myIntent.putExtra("ALARAMID", String.valueOf(c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID))));
 
-                    Log.d(TAG, "Final Time in MilliSeconds : " + calendar.getTimeInMillis());
-                    myIntent.putExtra("SATISH", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)) + ",Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + calendar.getTimeInMillis());
+                    long timeinMilliSeconds =  calendar.getTimeInMillis() - (15*60*1000);
+                    Log.d(TAG, "Final Time in MilliSeconds  Before : " + calendar.getTimeInMillis());
+                    Log.d(TAG, "Final Time in MilliSeconds After : " + timeinMilliSeconds);
+                    myIntent.putExtra("SATISH", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)) + ",Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + timeinMilliSeconds);
+                    myIntent.putExtra("TITLE", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
+                    myIntent.putExtra("MESSAGE", "Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)));
+                    myIntent.putExtra("NOTIFICATIONID", c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)) );
+
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID)), myIntent, 0);
 
                     //Log.d(TAG , " Time in Milli Seconds  "+AlarmManager.INTERVAL_DAY );
@@ -333,9 +340,11 @@ public class DashBoardActivity extends AppCompatActivity
 
                     //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
 
-                    if(System.currentTimeMillis()  <= calendar.getTimeInMillis())
+                    if(System.currentTimeMillis()  <= timeinMilliSeconds)
                     {
-                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeinMilliSeconds,AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+                        Log.d(TAG ,"Notification hasbeen set : ");
+                        Log.d(TAG, "Notification has been set : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
 
                     }
 

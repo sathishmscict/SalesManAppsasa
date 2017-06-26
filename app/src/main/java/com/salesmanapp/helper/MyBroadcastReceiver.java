@@ -68,6 +68,9 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         String message = myList.get(1);
         String scheduletime = myList.get(2);
 
+        title = intent.getStringExtra("TITLE");
+        message =intent.getStringExtra("MESSAGE");
+
         Log.d(TAG, "Current Time  : " + System.currentTimeMillis() + " Notification Time : " + scheduletime);
 
         long sad = System.currentTimeMillis();
@@ -80,7 +83,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         } else {
             Log.d(TAG, "Not Schedule On Time");
         }*/
-        String notid = intent.getStringExtra("ALARAMID");
+        String notid = intent.getStringExtra("NOTIFICATIONID");
 
 
 
