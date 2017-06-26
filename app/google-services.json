@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "308398204178",
+    "firebase_url": "https://salesmanapp-171211.firebaseio.com",
+    "project_id": "salesmanapp-171211",
+    "storage_bucket": "salesmanapp-171211.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308398204178:android:c95212c54a36ae19",
+        "android_client_info": {
+          "package_name": "com.salesmanapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "308398204178-adaq1u3076tae27u1i58ffgqhroksu6c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salesmanapp",
+            "certificate_hash": "86ad2cb1eb05d558035a594618f802175ff9f7c9"
+          }
+        },
+        {
+          "client_id": "308398204178-45sb8gqn550doaoe6uj84d13g9584ajb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADgIoJYWZZ69MdAeoWkb7bZVa_VKV3ybM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "308398204178-45sb8gqn550doaoe6uj84d13g9584ajb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

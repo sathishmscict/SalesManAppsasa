@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+
+
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvClose"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center|left"
+        android:paddingLeft="8dp"
+        android:textColor="@color/white"
+        android:text="Client Details"
+        android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+
+            <LinearLayout
+
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_username"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtNameWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+                    <EditText
+                        android:id="@+id/edtName"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:background="@null"
+
+                        android:gravity="center|left"
+                        android:hint="Contact Person Name"
+                        android:inputType="textCapWords"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:textColor="@color/black">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+            <LinearLayout
+
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_username"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtCompanynameWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+
+                    android:gravity="center|left">
+
+                    <EditText
+                        android:id="@+id/edtCompanyname"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:background="@null"
+
+                        android:gravity="center|left"
+                        android:hint="Company Name"
+                        android:inputType="textCapWords"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_mobile"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtMobileWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+
+                    <EditText
+                        android:id="@+id/edtMobile"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:background="@null"
+                        android:gravity="center|left"
+                        android:hint="Mobile No  1"
+                        android:inputType="numberSigned"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:maxLength="10"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_mobile"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtMobile2Wrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+
+                    <EditText
+                        android:id="@+id/edtMobile2"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:background="@null"
+                        android:gravity="center|left"
+                        android:hint="Mobile No  2"
+                        android:inputType="numberSigned"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:maxLength="10"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_landline"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtMobile3Wrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+
+                    <EditText
+                        android:id="@+id/edtMobile3"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:background="@null"
+                        android:gravity="center|left"
+                        android:hint="Landline No"
+                        android:inputType="numberSigned"
+                        android:maxLength="10"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:id="@+id/llemail"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_email"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtEmailWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+                    <EditText
+                        android:id="@+id/edtEmail"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:background="@null"
+                        android:gravity="center|left"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:hint="Enter Email"
+                        android:inputType="textEmailAddress"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black" />
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_occupation"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtBussinessWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left">
+
+
+                    <EditText
+                        android:id="@+id/edtBussiness"
+                        android:layout_width="fill_parent"
+                        android:layout_height="50dp"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+                        android:background="@null"
+                        android:gravity="center|left"
+                        android:hint="Business"
+                        android:inputType="textCapWords"
+                        android:paddingLeft="4dp"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_address"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtAddressWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left|top">
+
+
+                    <EditText
+                        android:id="@+id/edtAddress"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+
+                        android:background="@null"
+                        android:gravity="center|left|top"
+                        android:hint="Address"
+                        android:inputType="textCapWords|textMultiLine"
+                        android:maxLines="4"
+                        android:minLines="3"
+                        android:paddingLeft="4dp"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.87"
+                    android:src="@drawable/icon_notepad"
+                    android:tint="@color/colorPrimary" />
+
+                <android.support.design.widget.TextInputLayout
+
+                    android:id="@+id/edtNoteWrapper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="0.13"
+                    android:gravity="center|left|top">
+
+
+                    <EditText
+                        android:id="@+id/edtNote"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="0.13"
+
+                        android:background="@null"
+                        android:gravity="center|left|top"
+                        android:hint="Note"
+                        android:inputType="textCapWords|textMultiLine"
+                        android:maxLines="4"
+                        android:minLines="3"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:paddingLeft="4dp"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/black"
+                        android:visibility="visible">
+
+
+                    </EditText>
+
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

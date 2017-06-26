@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#146A92</color>
+    <color name="colorPrimaryDark">#115b7e</color>
+    <color name="colorAccent">#FF4081</color>
+
+
+    <color name="primary_light">#C5CAE9</color>
+
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+
+
+    <color name="cb_blue_button">#368ecd</color>
+    <color name="red">#FF0000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="black_overlay">#66000000</color>
+
+    <color name="viewbg">#22004780</color>
+    <color name="black">#000000</color>
+
+    <color name="deviderColor">#BDBDBD</color>
+    <color name="payu_blue">#368ecd</color>
+    <color name="yellow">#ffffcb05</color>
+
+
+</resources>
