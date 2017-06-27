@@ -91,6 +91,8 @@
                             android:id="@+id/edtServiceQuntity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:inputType="numberSigned"
 
                             android:hint="Quantity" />
                     </android.support.design.widget.TextInputLayout>
@@ -106,6 +108,8 @@
                             android:id="@+id/edtRate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:inputType="numberSigned"
 
                             android:hint="Rate" />
                     </android.support.design.widget.TextInputLayout>
@@ -120,7 +124,8 @@
                             android:id="@+id/edtDiscountAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-
+                            android:singleLine="true"
+                            android:inputType="numberSigned"
                             android:hint="Discount Amount" />
                     </android.support.design.widget.TextInputLayout>
 
@@ -143,7 +148,8 @@
                         android:id="@+id/edtNetAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-
+                        android:singleLine="true"
+                        android:inputType="numberSigned"
                         android:hint="Net Amount" />
                 </android.support.design.widget.TextInputLayout>
 

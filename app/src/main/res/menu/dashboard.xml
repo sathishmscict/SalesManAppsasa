@@ -9,6 +9,13 @@
         android:orderInCategory="100"
         balloonberry:showAsAction="always"
         android:title="CheckIn"/>
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/icon_search_white"
+        android:orderInCategory="100"
+        balloonberry:showAsAction="always"
+        android:title="Search"/>
+
 
 
     <item

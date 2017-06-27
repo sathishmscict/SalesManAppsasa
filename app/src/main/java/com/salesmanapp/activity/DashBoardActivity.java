@@ -15,10 +15,13 @@ import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -97,6 +100,7 @@ public class DashBoardActivity extends AppCompatActivity
     private ImageView ivSyncAnimation;
     private dbhandler db;
     private SQLiteDatabase sd;
+    private boolean doubleBackToExitPressedOnce;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -347,6 +351,7 @@ public class DashBoardActivity extends AppCompatActivity
                         Log.d(TAG, "Notification has been set : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
 
                     }
+
 
                     //alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+AlarmManager.INTERVAL_DAY,pendingIntent);
                     //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
@@ -733,6 +738,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 jsonObject.accumulate("latitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LATTITUDE)));
                                 jsonObject.accumulate("longitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)));
                                 jsonObject.accumulate("clienttype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_TYPE)));
+                                jsonObject.accumulate("website", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
                                 jsonObject.accumulate("note", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NOTE))));
 
 
@@ -848,12 +854,35 @@ public class DashBoardActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+      /*  DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }*/
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
         }
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click back again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+
+
     }
 
     private void SetGpsCongiguration(final boolean status)
@@ -1006,6 +1035,8 @@ public class DashBoardActivity extends AppCompatActivity
         SetGpsCongiguration(true);
 
 
+
+
         return true;
     }
 
@@ -1052,6 +1083,16 @@ public class DashBoardActivity extends AppCompatActivity
 
             }
             return true;
+        }
+        else if(id == R.id.action_search)
+        {
+            Intent intent = new Intent(context , SearchActivity.class);
+            startActivity(intent);
+            finish();
+
+
+
+
         }
         else if (id == R.id.action_sync)
         {
@@ -1378,6 +1419,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.CLIENT_MOBILE2, c.getString(AllKeys.TAG_MOBILE2));
                                 cv.put(dbhandler.CLIENT_LANDLINE, c.getString(AllKeys.TAG_LANDLINE));
                                 cv.put(dbhandler.CLIENT_EMAIL, c.getString(AllKeys.TAG_EMAIL));
+                                cv.put(dbhandler.CLIENT_WEBSITE, c.getString(AllKeys.TAG_CLIENT_WEBSITE));
                                 cv.put(dbhandler.CLIENT_BUSSINESS, c.getString(AllKeys.TAG_BUSINESS));
                                 cv.put(dbhandler.CLIENT_ADDRESS, c.getString(AllKeys.TAG_ADDRESS));
                                 cv.put(dbhandler.VISIT_DATE, c.getString(AllKeys.TAG_CREATED_DATE));
@@ -1455,4 +1497,6 @@ public class DashBoardActivity extends AppCompatActivity
 
         }
     }
+
+
 }

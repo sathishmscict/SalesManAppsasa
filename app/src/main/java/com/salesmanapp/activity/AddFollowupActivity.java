@@ -112,7 +112,7 @@ public class AddFollowupActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         year = cal.get(Calendar.YEAR);
         month = cal.get(Calendar.MONTH);
-        ++month;
+        //++month;
         day = cal.get(Calendar.DAY_OF_MONTH);
 
         setCurrentDate(year,month,day);
@@ -322,7 +322,7 @@ public class AddFollowupActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            setCurrentDate(year,++month,dayOfMonth);
+            setCurrentDate(year,month,dayOfMonth);
         }
     };
 
@@ -338,6 +338,7 @@ public class AddFollowupActivity extends AppCompatActivity {
     private void setCurrentDate(int year, int month, int day) {
 
         String mm="";
+        ++month;
         if(month <= 9)
         {
             mm ="0"+String.valueOf(month);

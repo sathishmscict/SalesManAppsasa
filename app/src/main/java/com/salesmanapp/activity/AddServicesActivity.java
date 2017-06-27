@@ -339,7 +339,7 @@ public class AddServicesActivity extends AppCompatActivity {
 
 
                             try {
-                                Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%ODRAND%'", null);
+                                Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%ODRAND"+ userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
                                 //cur_max_orderid.moveToFirst();
                                 int max_orderid = cur_max_orderid.getCount();
                                 ++max_orderid;
@@ -347,7 +347,7 @@ public class AddServicesActivity extends AppCompatActivity {
 
 
                                 ContentValues cv = new ContentValues();
-                                cv.put(dbhandler.ORDER_ID, "ODRAND" + max_orderid);
+                                cv.put(dbhandler.ORDER_ID, "ODRAND"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + max_orderid);
                                 cv.put(dbhandler.ORDER_SERVICEID, list_service_id.get(spnServices.getSelectedItemPosition()));
                                 cv.put(dbhandler.ORDER_QUANTITY, edtServiceQuntity.getText().toString());
                                 cv.put(dbhandler.ORDER_RATE, edtRate.getText().toString());

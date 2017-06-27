@@ -64,6 +64,7 @@ public class AllKeys {
 	public static final String TAG_MOBILENO="empmobile";
 	public static final String TAG_EMP_EMAIL = "empemail";
 	public static final String TAG_EMP_TYPE = "type";
+	public static final String TAG_EMP_UNIQUE_CODE = "uniquecode";
 
 	//ViewClientMst Related keys
 	public static final String TAG_CLIENTID = "clientid";
@@ -73,6 +74,7 @@ public class AllKeys {
 	public static final String TAG_MOBILE2 = "mobile2";
 	public static final String TAG_LANDLINE = "landline";
 	public static final String TAG_EMAIL = "email";
+	public static final String TAG_CLIENT_WEBSITE="website";
 	public static final String TAG_BUSINESS = "business";
 	public static final String TAG_ADDRESS = "address";
 	public static final String TAG_CONTACT_PERSON_NAME = "contactpersonname";

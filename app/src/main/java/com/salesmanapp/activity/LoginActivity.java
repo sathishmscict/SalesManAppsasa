@@ -300,11 +300,12 @@ public class LoginActivity extends AppCompatActivity  {
                                 String empEmail = c.getString(AllKeys.TAG_EMP_EMAIL);
                                 String empMobile = c.getString(AllKeys.TAG_MOBILENO);
                                 String empType = c.getString(AllKeys.TAG_EMP_TYPE);
+                                String empcode = c.getString(AllKeys.TAG_EMP_UNIQUE_CODE);
 
 
 
                                 //setUserDetails(String emp_id, String emp_name, String emp_email, String emp_mobile, String emp_type) {
-                                sessionmanager.setUserDetails(employeeid,empName,empEmail,empMobile,empType);
+                                sessionmanager.setUserDetails(employeeid,empName,empEmail,empMobile,empType,empcode);
 
 
 

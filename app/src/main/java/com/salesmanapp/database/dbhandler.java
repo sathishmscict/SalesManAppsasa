@@ -48,7 +48,7 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
     public static final String databasename = "SalesManApp.db";
-    public static final int dbversion = 15;
+    public static final int dbversion = 16;
     private final Context context;
 
     String query = "";
@@ -76,6 +76,7 @@ public class dbhandler extends SQLiteOpenHelper {
     public static final String CLIENT_TYPE = "ClientType";
     public static final String CLIENT_VISITING_CARD_FRONT = "ClientVisitingCardFront";
     public static final String CLIENT_VISITING_CARD_BACK = "ClientVisitingCardBack";
+    public static final String CLIENT_WEBSITE = "Website";
 
 
 
@@ -134,7 +135,7 @@ public class dbhandler extends SQLiteOpenHelper {
         try {
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "("+ UNIQUE_ID +" INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ,"+ CLIENT_DEVICE_TYPE +" TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT,"+ CLIENT_MOBILE2 +" TEXT,"+ CLIENT_LANDLINE +" TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT,"+ CLIENT_SYNC_STATUS +" TEXT,"+ CLIENT_COMPANYNAME +" TEXT,"+ CLIENT_LATTITUDE +" TEXT,"+ CLIENT_LONGTITUDE +" TEXT,"+ CLIENT_TYPE +" TEXT,"+ CLIENT_VISITING_CARD_FRONT +" TEXT,"+ CLIENT_VISITING_CARD_BACK +" TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "("+ UNIQUE_ID +" INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ,"+ CLIENT_DEVICE_TYPE +" TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT,"+ CLIENT_MOBILE2 +" TEXT,"+ CLIENT_LANDLINE +" TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT,"+ CLIENT_SYNC_STATUS +" TEXT,"+ CLIENT_COMPANYNAME +" TEXT,"+ CLIENT_LATTITUDE +" TEXT,"+ CLIENT_LONGTITUDE +" TEXT,"+ CLIENT_TYPE +" TEXT,"+ CLIENT_VISITING_CARD_FRONT +" TEXT,"+ CLIENT_VISITING_CARD_BACK +" TEXT,"+ CLIENT_WEBSITE +" TEXT)";
             Log.d("Table  : " + TABLE_CLIENTMASTER, query);
             db.execSQL(query);
 
@@ -191,7 +192,7 @@ public class dbhandler extends SQLiteOpenHelper {
 
         try {
 
-					db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLIENTMASTER);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLIENTMASTER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOLLOWUP_MASTER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_MASTER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_SERVICES);

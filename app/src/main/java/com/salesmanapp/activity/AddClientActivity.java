@@ -1,6 +1,7 @@
 package com.salesmanapp.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -126,6 +127,10 @@ public class AddClientActivity extends AppCompatActivity {
     private String BASE64STRING = "";
     private String IMAGE_NAME, IMAGE_URL;
     private String VISITING_CARD_FRONT = "", VISITING_CARD_BACK = "";
+    private ImageView imgPicContact;
+    private String MOBILENO,CONTACTNAME;
+    private EditText edtWebsite;
+    private TextInputLayout edtWebsiteWrapper;
 
 
     @Override
@@ -167,6 +172,7 @@ public class AddClientActivity extends AppCompatActivity {
         edtEmailWrapper = (TextInputLayout) findViewById(R.id.edtEmailWrapper);
         edtBusinessWrapper = (TextInputLayout) findViewById(R.id.edtBussinessWrapper);
         edtAddressWrapper = (TextInputLayout) findViewById(R.id.edtAddressWrapper);
+        edtWebsiteWrapper = (TextInputLayout)findViewById(R.id.edtWebsiteWrapper);
 
 
         edtName = (EditText) findViewById(R.id.edtName);
@@ -180,6 +186,49 @@ public class AddClientActivity extends AppCompatActivity {
         edtNote = (EditText) findViewById(R.id.edtNote);
         edtFollowupDate = (EditText) findViewById(R.id.edtFollowupDate);
         edtFollowupTime = (EditText) findViewById(R.id.edtFollowupTime);
+        edtWebsite = (EditText)findViewById(R.id.edtWebsite);
+        imgPicContact = (ImageView)findViewById(R.id.imgPicContact);
+
+        
+        imgPicContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Dexter.withActivity(AddClientActivity.this)
+                        .withPermission(Manifest.permission.READ_CONTACTS)
+                        .withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse response) {
+
+
+                                onClickSelectContact();
+
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                                onClickSelectContact();
+
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                                Toast.makeText(context, "Try again...    ", Toast.LENGTH_SHORT).show();
+                            }
+                        }).check();
+
+
+
+
+
+
+
+
+            }
+        });
+        
 
         chkFollowUp = (CheckBox) findViewById(R.id.chkFollowUp);
         llFollwoup = (LinearLayout) findViewById(R.id.llFolloup);
@@ -265,6 +314,7 @@ public class AddClientActivity extends AppCompatActivity {
                 String landline = ii.getStringExtra(dbhandler.CLIENT_LANDLINE);
                 String followupdate = ii.getStringExtra(dbhandler.FOLLOWUP_DATE);
                 String followuptime = ii.getStringExtra(dbhandler.FOLLOWUP_TIME);
+                String website = ii.getStringExtra(dbhandler.CLIENT_WEBSITE);
 
 
 
@@ -290,6 +340,7 @@ public class AddClientActivity extends AppCompatActivity {
                 edtEmail.setText(email);
                 edtFollowupDate.setText(followupdate);
                 edtFollowupTime.setText(followuptime);
+                edtWebsite.setText(website);
                 //Device Type
             }
 
@@ -485,6 +536,8 @@ public class AddClientActivity extends AppCompatActivity {
             cv.put(dbhandler.CLIENT_BUSSINESS, edtBusiness.getText().toString());
             cv.put(dbhandler.CLIENT_ADDRESS, edtAddress.getText().toString());
 
+            cv.put(dbhandler.CLIENT_WEBSITE, edtWebsite.getText().toString());
+
 
             cv.put(dbhandler.CLIENT_NOTE, edtNote.getText().toString());
             cv.put(dbhandler.CLIENT_SYNC_STATUS, "0");
@@ -516,7 +569,7 @@ public class AddClientActivity extends AppCompatActivity {
 
                 cv.put(dbhandler.VISIT_DATE, CurrentDate);
 
-                Cursor cur_max_clientid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_CLIENTMASTER+" where "+ dbhandler.CLIENT_ID +" like '%and%'", null);
+                Cursor cur_max_clientid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_CLIENTMASTER+" where "+ dbhandler.CLIENT_ID +" like '%and"+ userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
 
                 //cur_max_clientid.moveToFirst();
                 int max_clientid = cur_max_clientid.getCount();
@@ -524,7 +577,7 @@ public class AddClientActivity extends AppCompatActivity {
                 Log.d("Max Id By Goal : ", "" + max_clientid);
 
 
-                cv.put(dbhandler.CLIENT_ID, "and"+max_clientid);
+                cv.put(dbhandler.CLIENT_ID, "and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
                 cv.put(dbhandler.CLIENT_TYPE, "lead");
 
                 cv.put(dbhandler.CLIENT_VISITING_CARD_FRONT,VISITING_CARD_FRONT);
@@ -541,7 +594,7 @@ public class AddClientActivity extends AppCompatActivity {
                     cv_fallow.put(dbhandler.FOLLOWUP_DESCR, edtNote.getText().toString());
                     cv_fallow.put(dbhandler.FOLLOWUP_DATE, edtFollowupDate.getText().toString());
                     cv_fallow.put(dbhandler.FOLLOWUP_TIME, edtFollowupTime.getText().toString());
-                    cv_fallow.put(dbhandler.CLIENT_ID,"and"+max_clientid );
+                    cv_fallow.put(dbhandler.CLIENT_ID,"and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid );
                     cv_fallow.put(dbhandler.FOLLOWUP_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                     cv_fallow.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
 
@@ -549,7 +602,7 @@ public class AddClientActivity extends AppCompatActivity {
                     sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv_fallow);
                     cv_fallow.clear();
 
-                    Snackbar.make(coordinatelayout, "Followup details has been stored", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(coordinatelayout, "Client details has been stored", Snackbar.LENGTH_SHORT).show();
                 }
 
 
@@ -612,13 +665,32 @@ public class AddClientActivity extends AppCompatActivity {
 
     }
 
+    public void onClickSelectContact() {
+
+        // using native contacts selection
+        // Intent.ACTION_PICK = Pick an item from the data, returning what was
+        // selected.
+        try {
+
+            Intent intent = new Intent(Intent.ACTION_PICK,
+                    ContactsContract.Contacts.CONTENT_URI);
+            startActivityForResult(intent, 0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (requestCode == Camera.REQUEST_TAKE_PHOTO) {
+        if (requestCode == Camera.REQUEST_TAKE_PHOTO)
+        {
             bitmap = camera.getCameraBitmap();
             if (bitmap != null) {
                 // imgPreview.setImageBitmap(bitmap);
@@ -655,10 +727,73 @@ public class AddClientActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "Picture not taken!", Toast.LENGTH_SHORT).show();
             }
-        } else {
+        } else if(requestCode == SELECT_FILE){
 
             onSelectFromGalleryResult(data);
 
+        }
+        else
+        {
+            try {
+
+
+
+                        System.out.println("in on ActivityResult");
+                        Uri contactData = data.getData();
+                        Cursor c = managedQuery(contactData, null, null, null,
+                                null);
+                        if (c.moveToFirst()) {
+                            String id = c
+                                    .getString(c
+                                            .getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                            String hasPhone = c
+                                    .getString(c
+                                            .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+                            if (hasPhone.equalsIgnoreCase("1")) {
+                                Cursor phones = getContentResolver()
+                                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                                null,
+                                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                                                        + " = " + id, null,
+                                                null);
+                                phones.moveToFirst();
+                                MOBILENO = phones.getString(phones
+                                        .getColumnIndex("data1"));
+                                CONTACTNAME = phones
+                                        .getString(phones
+                                                .getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
+
+
+                                try {
+                                    MOBILENO = MOBILENO.substring(MOBILENO.length()-10,MOBILENO.length());
+                                    edtName.setText(CONTACTNAME);
+                                    edtMobile.setText(MOBILENO);
+
+
+
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                // here you can find out all the thing.
+                                System.out.println("NAME:" + CONTACTNAME);
+
+                                //MOBILENO = cNumber;
+                                Toast.makeText(context, "Length  : "+MOBILENO.length(),Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+
+
+
+
+
+
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -944,7 +1079,7 @@ public class AddClientActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            ++month;
+            //++month;
             if (month <= 9) {
                 mm = "0" + month;
             } else {
@@ -952,8 +1087,19 @@ public class AddClientActivity extends AppCompatActivity {
                 mm = "" + month;
 
             }
+            String str_day ="";
+            if(dayOfMonth <=9)
+            {
 
-            startdate = dayOfMonth + "-" + mm + "-" + year;
+                str_day ="0"+String.valueOf(dayOfMonth);
+            }
+            else
+            {
+                str_day =String.valueOf(dayOfMonth);
+
+            }
+
+            startdate = str_day + "-" + mm + "-" + year;
 
 
             edtFollowupDate.setText(startdate);

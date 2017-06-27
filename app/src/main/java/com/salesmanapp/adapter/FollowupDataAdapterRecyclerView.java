@@ -2,18 +2,27 @@ package com.salesmanapp.adapter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
@@ -46,16 +55,20 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
     private final Activity activity;
     private final dbhandler db;
     private final SQLiteDatabase sd;
+    private final String displayType;
     private Context context;
     ArrayList<FollowupData> list_FollowupData;
     LayoutInflater inflater;
     private String TAG = FollowupDataAdapterRecyclerView.class.getSimpleName();
     private int topic_approval_status;
     private ProgressDialog pDialog;
-    private long DELAY_MILLIS=2500;
+    private long DELAY_MILLIS=1500;
+
+    private ArrayList<FollowupData> list_followups = new ArrayList<FollowupData>();
 
 
-    public FollowupDataAdapterRecyclerView(Context context, ArrayList<FollowupData> TestMasterData, Activity activity) {
+
+    public FollowupDataAdapterRecyclerView(Context context, ArrayList<FollowupData> TestMasterData, Activity activity,String displayType) {
         this.context = context;
         this.list_FollowupData = TestMasterData;
         inflater = LayoutInflater.from(context);
@@ -66,6 +79,9 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
         db = new dbhandler(context);
         sd = db.getWritableDatabase();
+
+        this.displayType = displayType;
+
 
 
     }
@@ -87,6 +103,8 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         private final EditText edtFollowupDate;
         private final EditText edtFollowupTime;
         private final EditText edtCompnayName;
+        private final TextInputLayout edtFollowupDateWrapper;
+        private final LinearLayout llMenu;
 
         public MyViewHolder(View itemView) {
 
@@ -97,7 +115,10 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
             edtFollowupDate = (EditText) itemView.findViewById(R.id.edtFollowupDate);
             edtFollowupTime = (EditText) itemView.findViewById(R.id.edtFollowupTime);
             edtCompnayName = (EditText)itemView.findViewById(R.id.edtCompnayName);
+            edtFollowupDateWrapper = (TextInputLayout)itemView.findViewById(R.id.edtFollowupDateWrapper);
 
+
+             llMenu = (LinearLayout) itemView.findViewById(R.id.llMenu);
 
 
             ivLocation  = (ImageView)itemView.findViewById(R.id.ivLocation);
@@ -107,6 +128,28 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
             ivDelete  = (ImageView)itemView.findViewById(R.id.ivDelete);
             ivShow  = (ImageView)itemView.findViewById(R.id.ivShow);
 
+           /* if(displayType.equals("dashboard"))
+            {
+                edtFollowupDateWrapper.setVisibility(View.GONE);
+                llMenu.setVisibility(View.VISIBLE);
+
+            }
+            else if(displayType.equals("dialog"))
+            {
+                edtFollowupDateWrapper.setVisibility(View.VISIBLE);
+                llMenu.setVisibility(View.GONE);
+
+
+
+            }
+            else
+            {
+
+                edtFollowupDateWrapper.setVisibility(View.VISIBLE);
+                llMenu.setVisibility(View.VISIBLE);
+            }*/
+
+
 
         }
 
@@ -115,8 +158,19 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
     @Override
     public FollowupDataAdapterRecyclerView.MyViewHolder onCreateViewHolder(ViewGroup parent, int position) {
 
+         View view;
 
-        View view = inflater.inflate(R.layout.row_single_followup, parent, false);
+        if(displayType.equals("followup"))
+        {
+
+            view = inflater.inflate(R.layout.row_single_followup, parent, false);
+        }
+        else
+        {
+            view = inflater.inflate(R.layout.row_single_followup_for_other, parent, false);
+
+        }
+
 
         MyViewHolder myViewHolder = new MyViewHolder(view);
 
@@ -143,7 +197,25 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
 
 
+/*
+        if(displayType.equals("dialog") || displayType.equals("followup"))
+        {
+            //holder.edtCompnayName.setHint("Followup Date");
+            holder.edtCompnayName.setHint(context.getString(R.string.str_followup_date));
+            holder.edtCompnayName.setText(fd.getFollowupdate());
 
+
+
+            holder.edtFollowupDate.setVisibility(View.GONE);
+            holder.edtName.setVisibility(View.GONE);
+            holder.llMenu.setVisibility(View.GONE);
+
+        }
+        else
+        {
+            holder.edtCompnayName.setHint(context.getString(R.string.str_company_name));
+
+        }*/
 
 
         holder.ivServices.setOnClickListener(new View.OnClickListener() {
@@ -328,6 +400,114 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                     }
                 },DELAY_MILLIS);
 
+            }
+        });
+
+
+        holder.ivShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                initFlip(holder.ivShow);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final Dialog dialog = new Dialog(context);
+                        dialog.setContentView(R.layout.dialog_client_details);
+
+                        dialog.setCancelable(true);
+
+                        EditText  edtName = (EditText)dialog. findViewById(R.id.edtName);
+                        EditText   edtCompanyname = (EditText)dialog. findViewById(R.id.edtCompanyname);
+                        EditText   edtMobile = (EditText)dialog. findViewById(R.id.edtMobile);
+                        EditText  edtMobile2 = (EditText)dialog. findViewById(R.id.edtMobile2);
+                        EditText  edtLandline = (EditText)dialog. findViewById(R.id.edtMobile3);
+                        EditText  edtEmail = (EditText) dialog.findViewById(R.id.edtEmail);
+                        EditText  edtWebsite = (EditText) dialog.findViewById(R.id.edtWebsite);
+                        EditText edtBusiness = (EditText) dialog.findViewById(R.id.edtBussiness);
+                        EditText edtAddress = (EditText)dialog. findViewById(R.id.edtAddress);
+                        EditText edtNote = (EditText) dialog.findViewById(R.id.edtNote);
+
+                        edtName.setText(fd.getClientname());
+                        edtCompanyname.setText(fd.getCompanyname());
+                        edtMobile.setText(fd.getMoibleno1());
+                        edtMobile2.setText(fd.getMoibleno2());
+                        edtLandline.setText(fd.getLandline());
+                        edtEmail.setText(fd.getEmail());
+                        edtWebsite.setText(fd.getWebsite());
+                        edtBusiness.setText(fd.getBussiness());
+                        edtAddress.setText(fd.getAddress());
+                        edtNote.setText(fd.getNote());
+
+
+                        TextView tvClose = (TextView)dialog.findViewById(R.id.tvClose);
+
+                        tvClose.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                dialog.cancel();
+                                dialog.dismiss();
+                            }
+                        });
+
+                        TextView  txtnodata = (TextView)dialog.findViewById(R.id.txtnodata);
+
+                        RecyclerView rv_followup = (RecyclerView) dialog.findViewById(R.id.rv_followup);
+
+                        RecyclerView.LayoutManager lmanagr = new LinearLayoutManager(context);
+                        rv_followup.setLayoutManager(lmanagr);
+                        rv_followup.setItemAnimator(new DefaultItemAnimator());
+
+                        String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + "";
+                        query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID +"";
+                        Log.d(TAG, " Query : " + query);
+
+                        Cursor c = sd.rawQuery(query, null);
+
+                        Log.d(TAG, "Client Records : " + c.getCount() + "  found");
+
+                        list_followups.clear();
+                        if (c.getCount() > 0)
+                        {
+                            while (c.moveToNext())
+                            {
+                                //FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude) {
+                                FollowupData followupData = new FollowupData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ID)),c.getString(c.getColumnIndex("DevicType")),c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE1)),c.getString(c.getColumnIndex(dbhandler.CLIENT_BUSSINESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ADDRESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_NOTE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_EMAIL)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE2)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LANDLINE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_COMPANYNAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_TYPE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LATTITUDE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
+                                //ClientData cd = new ClientData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)));
+                                list_followups.add(followupData);
+
+
+                            }
+
+
+                            txtnodata.setVisibility(View.GONE);
+                            rv_followup.setVisibility(View.VISIBLE);
+
+                            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(context,list_followups,activity,"dialog");
+                            rv_followup.setAdapter(adapter);
+
+
+                        }
+                        else
+                        {
+                            Toast.makeText(context, "No client records found", Toast.LENGTH_SHORT).show();
+
+                            txtnodata.setVisibility(View.VISIBLE);
+                            rv_followup.setVisibility(View.GONE);
+                        }
+
+
+
+
+                        dialog.getWindow().setLayout(RecyclerView.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
+                        dialog.show();
+
+
+                    }
+                },DELAY_MILLIS);
             }
         });
 

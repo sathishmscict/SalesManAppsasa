@@ -7,10 +7,10 @@ package com.salesmanapp.pojo;
 public class FollowupData {
 
 
-    String followupid, followupdate,followuptime,followupnote,clientid,devicetype;
+    String followupid, followupdate,followuptime,followupnote,clientid,devicetype,website;
     String  clientname, moibleno1, bussiness, address, note, email, moibleno2, landline, companyname ,clienttype,lattitude,longtitude;
 
-    public FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude) {
+    public FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude,String website) {
         this.followupid = followupid;
         this.followupdate = followupdate;
         this.followuptime = followuptime;
@@ -29,6 +29,15 @@ public class FollowupData {
         this.clienttype = clienttype;
         this.lattitude = lattitude;
         this.longtitude = longtitude;
+        this.website = website;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public String getFollowupid() {

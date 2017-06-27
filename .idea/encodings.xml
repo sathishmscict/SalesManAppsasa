@@ -19,5 +19,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/salesmanapp/services/MyLocationService.java" charset="ISO-8859-1" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_splash_screen.xml" charset="ISO-8859-1" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_profile.xml" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/menu/menu_search.xml" charset="ISO-8859-1" />
   </component>
 </project>

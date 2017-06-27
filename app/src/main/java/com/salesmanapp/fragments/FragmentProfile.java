@@ -1065,7 +1065,7 @@ public class FragmentProfile extends Fragment {
                     if (error_status == false) {
 
                         //                      setUserDetails(String str_userid, String str_firstname, String str_lastname, String str_avatar, String str_email,  String str_mobile, String str_verified_mobile,String address,String gender) {
-                        sessionManager.setUserDetails(userdetails.get(SessionManager.KEY_EMP_ID), edtFirstname.getText().toString(), userdetails.get(SessionManager.KEY_EMP_EMAIL), userdetails.get(SessionManager.KEY_EMP_MOBILE), userdetails.get(SessionManager.KEY_EMP_TYPE));
+                        sessionManager.setUserDetails(userdetails.get(SessionManager.KEY_EMP_ID), edtFirstname.getText().toString(), userdetails.get(SessionManager.KEY_EMP_EMAIL), userdetails.get(SessionManager.KEY_EMP_MOBILE), userdetails.get(SessionManager.KEY_EMP_TYPE),userdetails.get(SessionManager.KEY_EMP_UNIQUE_CODE));
 
 
                         profile_edit.setVisible(true);

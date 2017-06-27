@@ -15,4 +15,7 @@
     <string name="firstname_hint">Name</string>
     <string name="title_activity_add_followup">AddFollowupActivity</string>
     <string name="title_activity_add_services">Add Services</string>
+    <string name="title_activity_search">SearchClients</string>
+    <string name="str_followup_date">Followup Date</string>
+    <string name="str_company_name">Company Name</string>
 </resources>

@@ -50,6 +50,7 @@ public class SessionManager {
 
 
     public static final String KEY_EMP_MOBILE = "EmpMobile", KEY_EMP_ID = "EmployeeId", KEY_EMP_NAME = "EmployeeName", KEY_EMP_EMAIL = "EmployeeEmail", KEY_EMP_TYPE = "employeeType";
+    public static final String KEY_EMP_UNIQUE_CODE="uniquescode";
 
 
     // Constructor
@@ -155,7 +156,7 @@ public class SessionManager {
 
     }
 
-    public void setUserDetails(String emp_id, String emp_name, String emp_email, String emp_mobile, String emp_type) {
+    public void setUserDetails(String emp_id, String emp_name, String emp_email, String emp_mobile, String emp_type,String emp_code) {
 
 
         editor.putString(KEY_EMP_ID, emp_id);
@@ -163,6 +164,7 @@ public class SessionManager {
         editor.putString(KEY_EMP_EMAIL, emp_email);
         editor.putString(KEY_EMP_MOBILE, emp_mobile);
         editor.putString(KEY_EMP_TYPE, emp_type);
+        editor.putString(KEY_EMP_UNIQUE_CODE, emp_code);
 
 
         editor.commit();
@@ -195,6 +197,8 @@ public class SessionManager {
         HashMap<String, String> user = new HashMap<String, String>();
 
 
+
+        user.put(KEY_EMP_UNIQUE_CODE  , pref.getString(KEY_EMP_UNIQUE_CODE , ""));
         user.put(KEY_CLIENTID , pref.getString(KEY_CLIENTID ,"0"));
 
 

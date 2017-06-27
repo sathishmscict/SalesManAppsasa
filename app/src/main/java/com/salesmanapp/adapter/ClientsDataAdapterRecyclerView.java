@@ -6,11 +6,15 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +38,7 @@ import com.salesmanapp.R;
 import com.salesmanapp.animation.FlipAnimation;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.pojo.ClientData;
+import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.session.SessionManager;
 
 import java.util.ArrayList;
@@ -57,6 +62,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
     private int topic_approval_status;
     private ProgressDialog pDialog;
     private long DELAY_MILLIS=2500;
+    private ArrayList<FollowupData> list_followups = new ArrayList<FollowupData>();
 
 
     public ClientsDataAdapterRecyclerView(Context context, ArrayList<ClientData> TestMasterData, Activity activity) {
@@ -93,6 +99,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
         private final ImageView ivEdit;
         private final ImageView ivDelete;
         private final ImageView ivShow;
+        private final EditText edtCompanyname;
 
         public MyViewHolder(View itemView) {
 
@@ -104,6 +111,8 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
             edtBussiness = (EditText) itemView.findViewById(R.id.edtBussiness);
             edtAddress = (EditText) itemView.findViewById(R.id.edtAddress);
             edtNote = (EditText) itemView.findViewById(R.id.edtNote);
+            edtCompanyname = (EditText)itemView.findViewById(R.id.edtCompanyname);
+
 
             btncall = (Button) itemView.findViewById(R.id.btncall);
             btnedit = (Button) itemView.findViewById(R.id.btnedit);
@@ -143,12 +152,16 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
         holder.edtName.setText(cd.getClientname());
 
+
         holder.edtAddress.setText(cd.getAddress());
         holder.edtBussiness.setText(cd.getBussiness());
         holder.edtBussiness.setVisibility(View.GONE);
         holder.edtEmail.setText(cd.getEmail());
+        holder.edtEmail.setVisibility(View.GONE);
         holder.edtMobile.setText(cd.getMoibleno1());
+        holder.edtMobile.setVisibility(View.GONE);
         holder.edtNote.setText(cd.getNote());
+        holder.edtCompanyname.setText(cd.getCompanyname());
 
 
         holder.btncall.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +210,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
                             Toast.makeText(activity, "Lattitude : "+cd.getLattitude()+" Longtitude : "+cd.getLongtitude(), Toast.LENGTH_SHORT).show();
 
-                            sessionManager.setGPSLocations("21.2049887","72.8385114",cd.getCompanyname());
+                           // sessionManager.setGPSLocations("21.2049887","72.8385114",cd.getCompanyname());
 
                             Intent intent = new Intent(context , ContactUsActivity.class);
                             context.startActivity(intent);
@@ -311,6 +324,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                         intent.putExtra(dbhandler.CLIENT_COMPANYNAME, cd.getCompanyname());
                         intent.putExtra(dbhandler.CLIENT_TYPE, cd.getClienttype());
                         intent.putExtra(dbhandler.CLIENT_DEVICE_TYPE, cd.getDevicetype());
+                        intent.putExtra(dbhandler.CLIENT_WEBSITE, cd.getWebsite());
 
                         context.startActivity(intent);
                     }
@@ -416,6 +430,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                         EditText  edtMobile2 = (EditText)dialog. findViewById(R.id.edtMobile2);
                         EditText  edtLandline = (EditText)dialog. findViewById(R.id.edtMobile3);
                         EditText  edtEmail = (EditText) dialog.findViewById(R.id.edtEmail);
+                        EditText  edtWebsite = (EditText) dialog.findViewById(R.id.edtWebsite);
                         EditText edtBusiness = (EditText) dialog.findViewById(R.id.edtBussiness);
                         EditText edtAddress = (EditText)dialog. findViewById(R.id.edtAddress);
                         EditText edtNote = (EditText) dialog.findViewById(R.id.edtNote);
@@ -426,12 +441,10 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                         edtMobile2.setText(cd.getMoibleno2());
                         edtLandline.setText(cd.getLandline());
                         edtEmail.setText(cd.getEmail());
+                        edtWebsite.setText(cd.getWebsite());
                         edtBusiness.setText(cd.getBussiness());
                         edtAddress.setText(cd.getAddress());
                         edtNote.setText(cd.getNote());
-
-
-
 
 
                         TextView tvClose = (TextView)dialog.findViewById(R.id.tvClose);
@@ -444,6 +457,54 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                                 dialog.dismiss();
                             }
                         });
+
+                        TextView  txtnodata = (TextView)dialog.findViewById(R.id.txtnodata);
+
+                       RecyclerView rv_followup = (RecyclerView) dialog.findViewById(R.id.rv_followup);
+
+                        RecyclerView.LayoutManager lmanagr = new LinearLayoutManager(context);
+                        rv_followup.setLayoutManager(lmanagr);
+                        rv_followup.setItemAnimator(new DefaultItemAnimator());
+
+                        String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + "";
+                        query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID +"";
+                        Log.d(TAG, " Query : " + query);
+
+                        Cursor c = sd.rawQuery(query, null);
+
+                        Log.d(TAG, "Client Records : " + c.getCount() + "  found");
+
+                        list_followups.clear();
+                        if (c.getCount() > 0)
+                        {
+                            while (c.moveToNext())
+                            {
+                                //FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude) {
+                                FollowupData followupData = new FollowupData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME)),c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ID)),c.getString(c.getColumnIndex("DevicType")),c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE1)),c.getString(c.getColumnIndex(dbhandler.CLIENT_BUSSINESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_ADDRESS)),c.getString(c.getColumnIndex(dbhandler.CLIENT_NOTE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_EMAIL)),c.getString(c.getColumnIndex(dbhandler.CLIENT_MOBILE2)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LANDLINE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_COMPANYNAME)),c.getString(c.getColumnIndex(dbhandler.CLIENT_TYPE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LATTITUDE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)),c.getString(c.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
+                                //ClientData cd = new ClientData(c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_CLIENT_ID)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DEVICE_TYPE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)), c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DATE)));
+                                list_followups.add(followupData);
+
+
+                            }
+
+
+                            txtnodata.setVisibility(View.GONE);
+                            rv_followup.setVisibility(View.VISIBLE);
+
+                            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(context,list_followups,activity,"clienstadapter");
+                            rv_followup.setAdapter(adapter);
+
+
+                        }
+                        else
+                        {
+                            Toast.makeText(context, "No client records found", Toast.LENGTH_SHORT).show();
+
+                            txtnodata.setVisibility(View.VISIBLE);
+                            rv_followup.setVisibility(View.GONE);
+                        }
+
+
 
 
                         dialog.getWindow().setLayout(RecyclerView.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);

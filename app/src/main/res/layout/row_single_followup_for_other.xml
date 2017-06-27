@@ -25,13 +25,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="4dp"
-
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <android.support.design.widget.TextInputLayout
 
             android:layout_weight="1"
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
@@ -48,27 +49,28 @@
                  />
         </android.support.design.widget.TextInputLayout>
 
-
         <android.support.design.widget.TextInputLayout
 
-            android:id="@+id/edtFollowupDateWrapper"
+            android:layout_weight="1"
+
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
+
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/edtFollowupDate"
-                android:layout_width="match_parent"
+                android:id="@+id/edtCompnayName"
+                android:layout_width="353dp"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:clickable="false"
                 android:cursorVisible="false"
                 android:editable="false"
                 android:focusable="false"
-                android:hint="Followup Date"
-
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:hint="Company Name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
         </android.support.design.widget.TextInputLayout>
+
 
 
     </LinearLayout>
@@ -85,27 +87,29 @@
 
 
 
+
+
             <android.support.design.widget.TextInputLayout
 
-                android:layout_weight="1"
-
+                android:id="@+id/edtFollowupDateWrapper"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
-                <!---->
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtCompnayName"
-                    android:layout_width="353dp"
+                    android:id="@+id/edtFollowupDate"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:clickable="false"
                     android:cursorVisible="false"
                     android:editable="false"
                     android:focusable="false"
-                    android:hint="Company Name"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                     />
+                    android:hint="Followup Date"
+
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </android.support.design.widget.TextInputLayout>
+
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/match_parentWrapper"
@@ -171,7 +175,7 @@
             android:layout_height="30dp"
             android:id="@+id/llMenu"
 
-
+            android:visibility="gone"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginTop="4dp"

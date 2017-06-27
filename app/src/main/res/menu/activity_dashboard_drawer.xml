@@ -17,10 +17,7 @@
         android:visible="false"
         android:title="Services" />
 
-        <item
-            android:id="@+id/nav_import"
-            android:icon="@drawable/icon_services"
-            android:title="Import" />
+
 
 
     <item
@@ -35,7 +32,10 @@
         android:title="Profile"
         android:visible="false" />
 
-
+        <item
+            android:id="@+id/nav_import"
+            android:icon="@drawable/icon_importdata"
+            android:title="Import" />
     <item
         android:id="@+id/nav_logout"
         android:icon="@drawable/icon_logout"
