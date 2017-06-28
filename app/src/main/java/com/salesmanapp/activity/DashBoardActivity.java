@@ -1422,7 +1422,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.CLIENT_WEBSITE, c.getString(AllKeys.TAG_CLIENT_WEBSITE));
                                 cv.put(dbhandler.CLIENT_BUSSINESS, c.getString(AllKeys.TAG_BUSINESS));
                                 cv.put(dbhandler.CLIENT_ADDRESS, c.getString(AllKeys.TAG_ADDRESS));
-                                cv.put(dbhandler.VISIT_DATE, c.getString(AllKeys.TAG_CREATED_DATE));
+                                cv.put(dbhandler.VISIT_DATE, dbhandler.convertToJsonDateFormat(c.getString(AllKeys.TAG_CREATED_DATE)));
                                 cv.put(dbhandler.CLIENT_NOTE, c.getString(AllKeys.TAG_NOTE));
                                 cv.put(dbhandler.CLIENT_SYNC_STATUS, "1");
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, c.getString(AllKeys.TAG_DEVICETYPE));

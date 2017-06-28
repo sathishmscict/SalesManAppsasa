@@ -162,7 +162,7 @@ public class FragmentTomorrow extends Fragment {
             txtnodata.setVisibility(View.GONE);
             rv_followup.setVisibility(View.VISIBLE);
 
-            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(getActivity(),list_followups,getActivity(),"followup");
+            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(getActivity(),list_followups,getActivity(),"dashboard");
             rv_followup.setAdapter(adapter);
 
 

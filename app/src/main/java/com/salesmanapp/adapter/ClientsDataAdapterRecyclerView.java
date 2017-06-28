@@ -10,6 +10,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,8 +37,15 @@ import com.salesmanapp.activity.AddServicesActivity;
 import com.salesmanapp.activity.ContactUsActivity;
 import com.salesmanapp.activity.DashBoardActivity;
 import com.salesmanapp.R;
+import com.salesmanapp.activity.DemoTabActivity;
+import com.salesmanapp.activity.ViewClientAndFollwupDataActivity;
 import com.salesmanapp.animation.FlipAnimation;
 import com.salesmanapp.database.dbhandler;
+import com.salesmanapp.fragments.FragmentHome;
+import com.salesmanapp.fragments.FragmentSpecificDate;
+import com.salesmanapp.fragments.FragmentToday;
+import com.salesmanapp.fragments.FragmentTomorrow;
+import com.salesmanapp.fragments.FragmentYesterday;
 import com.salesmanapp.pojo.ClientData;
 import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.session.SessionManager;
@@ -419,10 +428,21 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                     @Override
                     public void run() {
 
-                        final Dialog dialog = new Dialog(context);
+
+                        sessionManager.setClientid(cd.getClientid());
+                      Intent intent = new Intent(context , ViewClientAndFollwupDataActivity.class);
+                        //Intent intent = new Intent(context , DemoTabActivity.class);
+                        context.startActivity(intent);
+
+
+                      /*  final Dialog dialog = new Dialog(context);
                         dialog.setContentView(R.layout.dialog_client_details);
 
                         dialog.setCancelable(true);
+
+
+
+
 
                         EditText  edtName = (EditText)dialog. findViewById(R.id.edtName);
                         EditText   edtCompanyname = (EditText)dialog. findViewById(R.id.edtCompanyname);
@@ -434,6 +454,8 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                         EditText edtBusiness = (EditText) dialog.findViewById(R.id.edtBussiness);
                         EditText edtAddress = (EditText)dialog. findViewById(R.id.edtAddress);
                         EditText edtNote = (EditText) dialog.findViewById(R.id.edtNote);
+
+
 
                         edtName.setText(cd.getClientname());
                         edtCompanyname.setText(cd.getCompanyname());
@@ -508,7 +530,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
 
                         dialog.getWindow().setLayout(RecyclerView.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
-                        dialog.show();
+                        dialog.show();*/
 
 
                     }
@@ -518,6 +540,8 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
 
     }
+
+
 
 
     @Override

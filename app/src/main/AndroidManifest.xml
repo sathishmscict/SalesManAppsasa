@@ -142,6 +142,14 @@
         <activity
             android:name=".activity.SearchActivity"
             android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.ViewClientAndFollwupDataActivity"
+            android:label="@string/title_activity_view_client_and_follwup_data"
+            android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name=".activity.DemoTabActivity"
+            android:label="@string/title_activity_demo_tab"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

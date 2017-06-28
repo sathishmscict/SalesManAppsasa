@@ -105,7 +105,7 @@ public class AddClientActivity extends AppCompatActivity {
     private TextInputLayout edtCompanynameWrapper;
     private EditText edtFollowupDate;
     private EditText edtFollowupTime;
-    private int year, month, day;
+   // private int year, month, day;
     private String mm;
     private String startdate;
     private static final int DATE_PICKER_ID = 121;
@@ -244,9 +244,9 @@ public class AddClientActivity extends AppCompatActivity {
 
         //Set current date
         Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
+       int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
 
         ++month;
 
@@ -556,6 +556,7 @@ public class AddClientActivity extends AppCompatActivity {
             if (btnSave.getText().toString().toLowerCase().equals("update data")) {
 
 
+
                 sd.update(dbhandler.TABLE_CLIENTMASTER, cv, "" + dbhandler.CLIENT_ID + "='" + getIntent().getStringExtra(dbhandler.CLIENT_ID) + "' and " + dbhandler.CLIENT_DEVICE_TYPE + "='" + getIntent().getStringExtra(dbhandler.CLIENT_DEVICE_TYPE) + "'", null);
 
                 Snackbar.make(coordinatelayout, "Client details has been updated successfully", Snackbar.LENGTH_SHORT).show();
@@ -766,6 +767,7 @@ public class AddClientActivity extends AppCompatActivity {
 
 
                                 try {
+                                    MOBILENO = MOBILENO.replace(" ","");
                                     MOBILENO = MOBILENO.substring(MOBILENO.length()-10,MOBILENO.length());
                                     edtName.setText(CONTACTNAME);
                                     edtMobile.setText(MOBILENO);
@@ -952,7 +954,7 @@ public class AddClientActivity extends AppCompatActivity {
         switch (id) {
             case DATE_PICKER_ID:
 
-                return new DatePickerDialog(context, pickerlistener, year, month, day);
+                return new DatePickerDialog(context, pickerlistener, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
             case TIME_PICKER_ID:
                 Calendar cal = Calendar.getInstance();
                 return new TimePickerDialog(context, timepicker, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false);
@@ -1079,7 +1081,7 @@ public class AddClientActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-            //++month;
+            ++month;
             if (month <= 9) {
                 mm = "0" + month;
             } else {
@@ -1089,6 +1091,7 @@ public class AddClientActivity extends AppCompatActivity {
             }
             String str_day ="";
             if(dayOfMonth <=9)
+
             {
 
                 str_day ="0"+String.valueOf(dayOfMonth);

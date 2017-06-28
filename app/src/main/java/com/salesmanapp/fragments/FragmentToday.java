@@ -165,7 +165,7 @@ public class FragmentToday extends android.support.v4.app.Fragment {
             txtnodata.setVisibility(View.GONE);
             rv_followup.setVisibility(View.VISIBLE);
 
-            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(getActivity(),list_followups,getActivity(),"followup");
+            FollowupDataAdapterRecyclerView adapter = new FollowupDataAdapterRecyclerView(getActivity(),list_followups,getActivity(),"dashboard");
             rv_followup.setAdapter(adapter);
 
 

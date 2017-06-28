@@ -18,4 +18,8 @@
     <string name="title_activity_search">SearchClients</string>
     <string name="str_followup_date">Followup Date</string>
     <string name="str_company_name">Company Name</string>
+    <string name="title_activity_view_client_and_follwup_data">ViewClientAndFollwupDataActivity
+    </string>
+    <string name="title_activity_demo_tab">DemoTabActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

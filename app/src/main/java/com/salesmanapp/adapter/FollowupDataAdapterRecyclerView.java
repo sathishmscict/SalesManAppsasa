@@ -36,6 +36,7 @@ import com.salesmanapp.activity.AddServicesActivity;
 import com.salesmanapp.activity.ContactUsActivity;
 import com.salesmanapp.activity.DashBoardActivity;
 import com.salesmanapp.R;
+import com.salesmanapp.activity.ViewClientAndFollwupDataActivity;
 import com.salesmanapp.animation.FlipAnimation;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.pojo.FollowupData;
@@ -128,26 +129,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
             ivDelete  = (ImageView)itemView.findViewById(R.id.ivDelete);
             ivShow  = (ImageView)itemView.findViewById(R.id.ivShow);
 
-           /* if(displayType.equals("dashboard"))
-            {
-                edtFollowupDateWrapper.setVisibility(View.GONE);
-                llMenu.setVisibility(View.VISIBLE);
 
-            }
-            else if(displayType.equals("dialog"))
-            {
-                edtFollowupDateWrapper.setVisibility(View.VISIBLE);
-                llMenu.setVisibility(View.GONE);
-
-
-
-            }
-            else
-            {
-
-                edtFollowupDateWrapper.setVisibility(View.VISIBLE);
-                llMenu.setVisibility(View.VISIBLE);
-            }*/
 
 
 
@@ -160,7 +142,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
          View view;
 
-        if(displayType.equals("followup"))
+        if(displayType.equals("followup") || displayType.equals("dashboard"))
         {
 
             view = inflater.inflate(R.layout.row_single_followup, parent, false);
@@ -196,6 +178,16 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         holder.edtCompnayName.setText(fd.getCompanyname());
 
 
+
+        if(displayType.equals("dashboard"))
+        {
+            holder.edtFollowupDateWrapper.setVisibility(View.GONE);
+
+        }else
+        {
+            holder.edtFollowupDateWrapper.setVisibility(View.VISIBLE);
+
+        }
 
 /*
         if(displayType.equals("dialog") || displayType.equals("followup"))
@@ -414,7 +406,12 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                     @Override
                     public void run() {
 
-                        final Dialog dialog = new Dialog(context);
+                        sessionManager.setClientid(fd.getClientid());
+                        Intent intent = new Intent(context , ViewClientAndFollwupDataActivity.class);
+                        //Intent intent = new Intent(context , DemoTabActivity.class);
+                        context.startActivity(intent);
+
+                      /*  final Dialog dialog = new Dialog(context);
                         dialog.setContentView(R.layout.dialog_client_details);
 
                         dialog.setCancelable(true);
@@ -503,7 +500,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
 
                         dialog.getWindow().setLayout(RecyclerView.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
-                        dialog.show();
+                        dialog.show();*/
 
 
                     }
