@@ -138,7 +138,7 @@ public class FragmentClients extends android.support.v4.app.Fragment {
     //onCreateView Completed
     private void FillDataOnRecyclerView()
     {
-        String query = "select * from " + dbhandler.TABLE_CLIENTMASTER + "";
+        String query = "select * from " + dbhandler.TABLE_CLIENTMASTER;
         Log.d(TAG, " Query : " + query);
 
         Cursor c = sd.rawQuery(query, null);

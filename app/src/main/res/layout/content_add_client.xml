@@ -362,7 +362,7 @@
                                         android:gravity="center|left"
                                         android:hint="Landline No"
                                         android:inputType="numberSigned"
-                                        android:maxLength="10"
+                                        android:maxLength="11"
                                         android:paddingLeft="4dp"
                                         android:singleLine="true"
                                         android:textColor="@color/black"

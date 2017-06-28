@@ -168,7 +168,7 @@ public class AddFollowupActivity extends AppCompatActivity {
                     cv.put(dbhandler.FOLLOWUP_DATE, edtFollowupDate.getText().toString());
                     cv.put(dbhandler.FOLLOWUP_TIME, edtFollowupTime.getText().toString());
                     cv.put(dbhandler.FOLLOWUP_DESCR, edtDescr.getText().toString());
-                    cv.put(dbhandler.FOLLOWUP_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
+                    cv.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
 
                     if (btnsave.getText().toString().toLowerCase().equals("update data")) {
 

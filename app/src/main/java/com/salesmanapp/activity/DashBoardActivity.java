@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -49,6 +50,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.salesmanapp.MyFirebaseInstanceIDService;
 import com.salesmanapp.R;
 import com.salesmanapp.adapter.FollowupDataAdapterRecyclerView;
 import com.salesmanapp.app.MyApplication;
@@ -180,6 +182,7 @@ public class DashBoardActivity extends AppCompatActivity
 
 
             setupLocalNotifications();
+            UpdateFcmTokenDetailsToServer();
 
         }
 
@@ -249,6 +252,67 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
+    private void UpdateFcmTokenDetailsToServer()
+    {
+        showDialog();
+
+
+        //String url = AllKeys.WEBSITE + "updateSellerFCM?device_type=android&sellerid=" + userDetails.get(SessionManager.KEY_SELLER_ID) + "&fcm=" + fcm_tokenid + "";
+        String url = AllKeys.WEBSITE + "InsertFCMToken";
+
+        Log.d(TAG, "URL  InsertFCMToken : " + url);
+
+
+        CustomRequest request = new CustomRequest(Request.Method.POST, url, null,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                Log.d(TAG, "Response InsertFCMToken : " + response.toString());
+                hideDialog();
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                if (error instanceof ServerError || error instanceof NetworkError) {
+                    hideDialog();
+                } else {
+                    UpdateFcmTokenDetailsToServer();
+                }
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> params = new HashMap<String, String>();
+
+                String fcm_tokenid = "";
+                try {
+                    MyFirebaseInstanceIDService mid = new MyFirebaseInstanceIDService();
+                    fcm_tokenid = mid.onTokenRefreshNew(context);
+
+                } catch (Exception e) {
+                    fcm_tokenid = "";
+                    e.printStackTrace();
+                }
+
+
+                params.put("type", "fcmtoken");
+                params.put("userid", userDetails.get(SessionManager.KEY_EMP_ID));
+                params.put("fcmtoken", fcm_tokenid);
+
+                Log.d(TAG, "Update FCM Params :" + params.toString());
+
+
+                return params;
+            }
+        };
+
+        MyApplication.getInstance().addToRequestQueue(request);
+
+
+    }
     private void setupLocalNotifications()
     {
 
@@ -1180,7 +1244,7 @@ public class DashBoardActivity extends AppCompatActivity
 
 
 
-        String url  = AllKeys.WEBSITE+"ViewServiceMaster?type=service";
+        String url  = AllKeys.WEBSITE+"ViewServiceMaster?type=service&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
         Log.d(TAG , "URL ViewServiceMaster "+ url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -1284,7 +1348,7 @@ public class DashBoardActivity extends AppCompatActivity
 
 
 
-        String url  = AllKeys.WEBSITE+"ViewFollowupData?type=followup";
+        String url  = AllKeys.WEBSITE+"ViewFollowupData?type=followup&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
         Log.d(TAG , "URL ViewFollowupData "+ url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -1324,7 +1388,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.FOLLOWUP_DATE, c.getString(AllKeys.TAG_DATE));
                                 cv.put(dbhandler.FOLLOWUP_TIME, c.getString(AllKeys.TAG_TIME));
                                 cv.put(dbhandler.FOLLOWUP_DESCR, c.getString(AllKeys.TAG_DESCRIPTION));
-                                cv.put(dbhandler.FOLLOWUP_EMPLOYEE_ID,c.getString(AllKeys.TAG_EMPID));
+                                cv.put(dbhandler.EMPLOYEE_ID,c.getString(AllKeys.TAG_EMPID));
 
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, c.getString(AllKeys.TAG_DEVICETYPE));
                                 sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER ,null,cv);
@@ -1381,7 +1445,7 @@ public class DashBoardActivity extends AppCompatActivity
 
 
 
-        String url  = AllKeys.WEBSITE+"ViewClientMst?type=clientdata";
+        String url  = AllKeys.WEBSITE+"ViewClientMst?type=clientdata&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
         Log.d(TAG , "URL  "+ url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -1432,6 +1496,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.CLIENT_TYPE, c.getString(AllKeys.TAG_CLIENT_TYPE));
                                 cv.put(dbhandler.CLIENT_VISITING_CARD_FRONT, c.getString(AllKeys.TAG_VISITING_CARD_FRONT));
                                 cv.put(dbhandler.CLIENT_VISITING_CARD_BACK, c.getString(AllKeys.TAG_VISITING_CARD_BACK));
+                                cv.put(dbhandler.EMPLOYEE_ID, AllKeys.TAG_EMPID);
 
                                 sd.insert(dbhandler.TABLE_CLIENTMASTER, null, cv);
 

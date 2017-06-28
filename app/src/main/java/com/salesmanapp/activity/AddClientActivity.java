@@ -548,12 +548,16 @@ public class AddClientActivity extends AppCompatActivity {
 
 
 
+
             userDetails = sessionmanager.getSessionDetails();
             cv.put(dbhandler.CLIENT_LATTITUDE, userDetails.get(SessionManager.KEY_LATTITUDE));
             cv.put(dbhandler.CLIENT_LONGTITUDE, userDetails.get(SessionManager.KEY_LONGTITUDE));
 
+            cv.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
+
 
             if (btnSave.getText().toString().toLowerCase().equals("update data")) {
+
 
 
 
@@ -562,6 +566,7 @@ public class AddClientActivity extends AppCompatActivity {
                 Snackbar.make(coordinatelayout, "Client details has been updated successfully", Snackbar.LENGTH_SHORT).show();
 
             } else {
+
 
 
                 String time = dbhandler.getDateTime();
@@ -596,7 +601,7 @@ public class AddClientActivity extends AppCompatActivity {
                     cv_fallow.put(dbhandler.FOLLOWUP_DATE, edtFollowupDate.getText().toString());
                     cv_fallow.put(dbhandler.FOLLOWUP_TIME, edtFollowupTime.getText().toString());
                     cv_fallow.put(dbhandler.CLIENT_ID,"and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid );
-                    cv_fallow.put(dbhandler.FOLLOWUP_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
+                    cv_fallow.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                     cv_fallow.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
 
 
