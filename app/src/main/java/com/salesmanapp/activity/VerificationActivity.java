@@ -68,6 +68,7 @@ public class VerificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verification);
         //setContentView(R.layout.demo_layout);
+        //setContentView(R.layout.demo_layout);
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
@@ -461,7 +462,7 @@ public class VerificationActivity extends AppCompatActivity {
             int code = r.nextInt(9999 - 1000) + 1000;
             Log.d(TAG, "Verification Code : " + code);
             // sendsms = AllKeys.WEBSITE + "sendSMS/" + userDetails.get(SessionManager.KEY_USER_MOBILE) + "/" + code + "/otp";
-            sendsms = AllKeys.WEBSITE + "VerificationService?type=Verification&code=" + code + "&mobile=" + userDetails.get(SessionManager.KEY_EMP_MOBILE) + "";
+
             sendsms = AllKeys.WEBSITE +"VerificationService?type=verification&code="+ code+"&mobile="+ userDetails.get(SessionManager.KEY_EMP_MOBILE) +"";
 
 
@@ -472,7 +473,7 @@ public class VerificationActivity extends AppCompatActivity {
             userDetails = sessionmanager.getSessionDetails();
             //sendsms = AllKeys.WEBSITE + "sendSMS/" + userDetails.get(SessionManager.KEY_USER_MOBILE) + "/" + userDetails.get(SessionManager.KEY_CODE) + "/otp";
 
-            sendsms = AllKeys.WEBSITE + "VerificationService?type=Verification&code=" + userDetails.get(SessionManager.KEY_CODE) + "&mobile=" + userDetails.get(SessionManager.KEY_EMP_MOBILE) + "";
+            sendsms = AllKeys.WEBSITE + "VerificationService?type=verification&code=" + userDetails.get(SessionManager.KEY_CODE) + "&mobile=" + userDetails.get(SessionManager.KEY_EMP_MOBILE) + "";
 
 
             //sendsms = userDetails.get(SessionManager.KEY_SMSURL);

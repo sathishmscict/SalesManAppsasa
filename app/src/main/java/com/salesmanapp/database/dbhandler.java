@@ -27,6 +27,8 @@ import android.view.View;
 
 import com.salesmanapp.activity.DashBoardActivity;
 import com.salesmanapp.R;
+import com.salesmanapp.activity.FollowupResponseActivity;
+import com.salesmanapp.adapter.FollowupDataAdapterRecyclerView;
 import com.salesmanapp.session.SessionManager;
 
 import java.io.ByteArrayOutputStream;
@@ -48,11 +50,10 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
     public static final String databasename = "SalesManApp.db";
-    public static final int dbversion = 18;
+    public static final int dbversion = 21;
     private final Context context;
 
     String query = "";
-
 
 
     public static final String TABLE_CLIENTMASTER = "ClientMst";
@@ -80,7 +81,6 @@ public class dbhandler extends SQLiteOpenHelper {
     //public static final String CLIENT_EMPLOYEEID = "EmployeeId";
 
 
-
     public static final String TABLE_LOCATION_MASTER = "LocationMst";
     public static final String LOCATION_ID = "LocationId";
     public static final String LOCATION_TIME = "LocationTime";
@@ -97,7 +97,14 @@ public class dbhandler extends SQLiteOpenHelper {
     //public static final String FOLLOWUP_CLIENT_ID = "ClientId";
     public static final String EMPLOYEE_ID = "EmployeeId";
     //public static final String FOLLOWUP_DEVICE_TYPE = "DeviceType";
+    public static final String FOLLOWUP_STATUS = "FollowupStatus";
+    public static final String FOLLOWUP_REASON = "FollowupReason";
 
+    /*FOLLOWUP_STATUS
+    0= Default
+    1 =Yes
+    2=No
+    3=Reschedule*/
 
 
     public static final String TABLE_SERVICES = "ServiceMst";
@@ -117,9 +124,6 @@ public class dbhandler extends SQLiteOpenHelper {
     public static final String ORDER_DATE = "Date";
 
 
-
-
-
     private static String TAG = dbhandler.class.getSimpleName();
 
 
@@ -136,12 +140,9 @@ public class dbhandler extends SQLiteOpenHelper {
         try {
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "("+ UNIQUE_ID +" INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ,"+ CLIENT_DEVICE_TYPE +" TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT,"+ CLIENT_MOBILE2 +" TEXT,"+ CLIENT_LANDLINE +" TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT,"+ CLIENT_SYNC_STATUS +" TEXT,"+ CLIENT_COMPANYNAME +" TEXT,"+ CLIENT_LATTITUDE +" TEXT,"+ CLIENT_LONGTITUDE +" TEXT,"+ CLIENT_TYPE +" TEXT,"+ CLIENT_VISITING_CARD_FRONT +" TEXT,"+ CLIENT_VISITING_CARD_BACK +" TEXT,"+ CLIENT_WEBSITE +" TEXT,"+ EMPLOYEE_ID +" TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ," + CLIENT_DEVICE_TYPE + " TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT," + CLIENT_MOBILE2 + " TEXT," + CLIENT_LANDLINE + " TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT," + CLIENT_SYNC_STATUS + " TEXT," + CLIENT_COMPANYNAME + " TEXT," + CLIENT_LATTITUDE + " TEXT," + CLIENT_LONGTITUDE + " TEXT," + CLIENT_TYPE + " TEXT," + CLIENT_VISITING_CARD_FRONT + " TEXT," + CLIENT_VISITING_CARD_BACK + " TEXT," + CLIENT_WEBSITE + " TEXT," + EMPLOYEE_ID + " TEXT)";
             Log.d("Table  : " + TABLE_CLIENTMASTER, query);
             db.execSQL(query);
-
-
-
 
 
             query = "CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION_MASTER + "(" + LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + LOCATION_TIME + " TEXT," + LOCATION_LATTITUDE + " TEXT," + LOCATION_LONGTITUDE + " TEXT," + LOCATION_SYNC_STATUS + " TEXT)";
@@ -153,28 +154,14 @@ public class dbhandler extends SQLiteOpenHelper {
             db.execSQL(query);
 
 
-
-
-
-
-
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_FOLLOWUP_MASTER + "(" + FOLLOWUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + FOLLOWUP_DESCR + " TEXT," + FOLLOWUP_DATE + " TEXT," + FOLLOWUP_TIME + " TEXT," + CLIENT_ID + " TEXT, "+ EMPLOYEE_ID +" TEXT,"+ CLIENT_DEVICE_TYPE +" TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_FOLLOWUP_MASTER + "(" + FOLLOWUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + FOLLOWUP_DESCR + " TEXT," + FOLLOWUP_DATE + " TEXT," + FOLLOWUP_TIME + " TEXT," + CLIENT_ID + " TEXT, " + EMPLOYEE_ID + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT," + FOLLOWUP_STATUS + " TEXT," + FOLLOWUP_REASON + " TEXT)";
             Log.d("Table  : " + TABLE_FOLLOWUP_MASTER, query);
             db.execSQL(query);
 
 
-
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_MASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + ORDER_ID + " TEXT," + ORDER_SERVICEID + " INTEGER," + ORDER_QUANTITY + " TEXT," + ORDER_RATE + " TEXT, "+ ORDER_DISCOUNT_AMOUNT +" TEXT,"+ ORDER_NET_AMOUNT +" TEXT,"+ ORDER_CLIENT_ID +" TEXT,"+ ORDER_EMPLOYEE_ID +" TEXT,"+ ORDER_DATE +" TEXT,"+ CLIENT_DEVICE_TYPE +" TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_MASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + ORDER_ID + " TEXT," + ORDER_SERVICEID + " INTEGER," + ORDER_QUANTITY + " TEXT," + ORDER_RATE + " TEXT, " + ORDER_DISCOUNT_AMOUNT + " TEXT," + ORDER_NET_AMOUNT + " TEXT," + ORDER_CLIENT_ID + " TEXT," + ORDER_EMPLOYEE_ID + " TEXT," + ORDER_DATE + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT)";
             Log.d("Table  : " + TABLE_ORDER_MASTER, query);
             db.execSQL(query);
-
-
-
-
-
-
-
-
 
 
             db.execSQL("create table IF NOT EXISTS Notification_Mst(id INTEGER PRIMARY KEY AUTOINCREMENT,header TEXT,notification TEXT,ndate text)");
@@ -182,7 +169,7 @@ public class dbhandler extends SQLiteOpenHelper {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            Log.d(TAG , "dbhandler onCreate : "+ e.getMessage());
+            Log.d(TAG, "dbhandler onCreate : " + e.getMessage());
         }
 
     }
@@ -202,7 +189,7 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
 /*
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBTASK);*/
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_SUBTASK);*/
            /* db.execSQL("DROP TABLE IF EXISTS Notification_Mst");
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLIENTMASTER);
@@ -260,7 +247,6 @@ public class dbhandler extends SQLiteOpenHelper {
             companyname = "Shah Agency";
         return companyname;
     }
-
 
 
     public static final String convertToJsonDateFormat(String cur_date) {
@@ -490,7 +476,6 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
     /**
-     *
      * @param title
      * @param textMessage
      * @param context
@@ -498,19 +483,15 @@ public class dbhandler extends SQLiteOpenHelper {
      */
 
     @SuppressLint("NewApi")
-    public static void Notify(String title, String textMessage, Context context, String notid)
-    {
+    public static void Notify(String title, String textMessage, Context context, String notid) {
         try {
             /**
              * Simple Notification
              */
 
 
-
-
-
-            SessionManager sessionManager =  new SessionManager(context);
-            HashMap<String,String> userDetails = new HashMap<String, String>();
+            SessionManager sessionManager = new SessionManager(context);
+            HashMap<String, String> userDetails = new HashMap<String, String>();
             userDetails = sessionManager.getSessionDetails();
         /*    if(userDetails.get(SessionManager.KEY_SETTINGS_NOTIFY).equals("1"))
             {
@@ -523,10 +504,6 @@ public class dbhandler extends SQLiteOpenHelper {
             {
                 sessionManager.setAlaramStatus("false");
             }*/
-
-
-
-
 
 
             //Set Vibration
@@ -542,6 +519,9 @@ public class dbhandler extends SQLiteOpenHelper {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
 
+            sessionManager.setFollowupId(notid);
+
+            Log.d(TAG, "Notofication Or FollowupID  : " + notid);
             //Set Color
             int color = context.getResources().getColor(R.color.colorPrimaryDark);
             builder.setColor(color);
@@ -553,18 +533,16 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
             //Set Intent to notification action
-            Random r= new Random();
+            Random r = new Random();
 
             int mNotificationId = r.nextInt(1000);
             mNotificationId = Integer.parseInt(notid);
-            Log.d("dbhandler","Notification Id From Method :"+mNotificationId);
+            Log.d("dbhandler", "Notification Id From Method :" + mNotificationId);
             Intent notificationIntent = null;
             try {
 
                 notificationIntent = new Intent(context,
-                        DashBoardActivity.class);
-
-
+                        FollowupResponseActivity.class);
 
 
             } catch (Exception e) {
@@ -577,6 +555,7 @@ public class dbhandler extends SQLiteOpenHelper {
 
             builder.setContentIntent(resultPendingIntent);
             builder.addAction(R.drawable.icon_notification, "Show", resultPendingIntent);
+
 
             builder.setAutoCancel(true);
             /*builder.setWhen(0);*/
@@ -614,7 +593,6 @@ public class dbhandler extends SQLiteOpenHelper {
             NotificationManagerCompat.from(this).notify(mNotificationId, notification1);
             notification1.flags |= Notification.FLAG_AUTO_CANCEL;
 */
-
 
 
             NotificationManager notificationManager = (NotificationManager) context

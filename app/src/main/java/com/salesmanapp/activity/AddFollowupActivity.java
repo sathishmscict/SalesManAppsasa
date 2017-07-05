@@ -161,7 +161,15 @@ public class AddFollowupActivity extends AppCompatActivity {
                 }
 
 
-                if (isError == false) {
+             /*   Event event = new Event()
+                        .setSummary("Google I/O 2015")
+                        .setLocation("800 Howard St., San Francisco, CA 94103")
+                        .setDescription("A chance to hear more about Google's developer products.");
+
+
+*/
+                if (isError == false)
+                {
 
                     ContentValues cv = new ContentValues();
                     cv.put(dbhandler.CLIENT_ID, list_client_id.get(spnClients.getSelectedItemPosition()));
@@ -170,10 +178,13 @@ public class AddFollowupActivity extends AppCompatActivity {
                     cv.put(dbhandler.FOLLOWUP_DESCR, edtDescr.getText().toString());
                     cv.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
 
+
                     if (btnsave.getText().toString().toLowerCase().equals("update data")) {
 
-
+                        cv.put(dbhandler.FOLLOWUP_DESCR, edtDescr.getText().toString());
+                        cv.put(dbhandler.FOLLOWUP_REASON, getIntent().getStringExtra(dbhandler.FOLLOWUP_REASON));
                         cv.put(dbhandler.CLIENT_DEVICE_TYPE, getIntent().getStringExtra(dbhandler.CLIENT_DEVICE_TYPE));
+                        Log.d(TAG, " Update Followup :  "+cv.toString());
                         sd.update(dbhandler.TABLE_FOLLOWUP_MASTER ,cv, dbhandler.FOLLOWUP_ID +"="+ FOLLOWUPID +" and "+ dbhandler.CLIENT_ID +"='"+ getIntent().getStringExtra(dbhandler.CLIENT_ID) +"'",null);
                         Snackbar.make(coordinateLayout, "Records has been updated ", Snackbar.LENGTH_SHORT).show();
 
@@ -183,7 +194,11 @@ public class AddFollowupActivity extends AppCompatActivity {
                     else
                     {
 
+
+                        cv.put(dbhandler.FOLLOWUP_STATUS, "0");
                         cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
+                        cv.put(dbhandler.FOLLOWUP_REASON, "");
+                        Log.d(TAG, " Insert Followup :  "+cv.toString());
                         sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER ,null,cv);
                         Snackbar.make(coordinateLayout, "Records has been saved", Snackbar.LENGTH_SHORT).show();
 
@@ -255,7 +270,8 @@ public class AddFollowupActivity extends AppCompatActivity {
 
     }
 
-    private void setCurrentTime(int hour, int minute) {
+    private void setCurrentTime(int hour, int minute)
+    {
 
         String MERIDIAN="";
         if(hour > 12)
@@ -349,11 +365,24 @@ public class AddFollowupActivity extends AppCompatActivity {
             mm =String.valueOf(month);
         }
 
-        edtFollowupDate.setText(day+"-"+mm+"-"+year);
+        String  str_day = "";
+        if(day <= 9 )
+        {
+
+
+            str_day = "0"+String.valueOf(day);
+        }
+        else
+        {
+            str_day = String.valueOf(str_day);
+        }
+
+        edtFollowupDate.setText(str_day+"-"+mm+"-"+year);
 
     }
 
-    private void FillDataOnSpinner() {
+    private void FillDataOnSpinner()
+    {
         String query = "select * from " + dbhandler.TABLE_CLIENTMASTER + "";
         Log.d(TAG, "Query  : ");
 

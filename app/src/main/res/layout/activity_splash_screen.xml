@@ -83,12 +83,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/progressBar2" />-->
-        <com.wang.avi.AVLoadingIndicatorView
+<!--        <com.wang.avi.AVLoadingIndicatorView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:indicatorColor="#FB8926"
-            app:indicatorName="TriangleSkewSpinIndicator" />
+            app:indicatorName="TriangleSkewSpinIndicator" />-->
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+
+
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:progressTint="#FB8926" />
         <!--BallPulseIndicator-->
 
 

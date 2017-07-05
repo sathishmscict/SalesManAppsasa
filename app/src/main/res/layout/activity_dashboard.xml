@@ -69,7 +69,7 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         android:scrollbars="none"
-        app:itemIconTint="@color/colorPrimaryDark"
+        app:itemIconTint="@color/colorPrimary"
         app:menu="@menu/activity_dashboard_drawer" />
 
 

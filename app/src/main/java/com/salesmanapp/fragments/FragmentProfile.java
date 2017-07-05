@@ -67,7 +67,7 @@ import com.salesmanapp.helper.ImageUtils;
 import com.salesmanapp.helper.NetConnectivity;
 import com.salesmanapp.helper.Utility;
 import com.salesmanapp.session.SessionManager;
-import com.wang.avi.AVLoadingIndicatorView;
+/*import com.wang.avi.AVLoadingIndicatorView;*/
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -178,7 +178,7 @@ public class FragmentProfile extends Fragment {
     public EditText edtOldPassword;
     public Button btnUpdate;
     public LinearLayout llProcess;
-    private AVLoadingIndicatorView progress;
+//    private AVLoadingIndicatorView progress;
 
     public TextView txtStatus;
     private LinearLayout llUpdateUI;
@@ -303,7 +303,7 @@ public class FragmentProfile extends Fragment {
 
 
                         //Send Details To Server
-                        progress.setVisibility(View.VISIBLE);
+                      //  progress.setVisibility(View.VISIBLE);
                         txtStatus.setText("Please wait...");
                         String url_updatePassword = AllKeys.WEBSITE + "udpatePassword/" + userdetails.get(SessionManager.KEY_EMP_ID) + "/" + dbhandler.convertEncodedString(edtOldPassword.getText().toString()) + "/" + dbhandler.convertEncodedString(edtNewPassword.getText().toString()) + "";
                         url_updatePassword = AllKeys.WEBSITE + "UpdatePassword?type=updatepassword&id=" + userdetails.get(SessionManager.KEY_EMP_ID) + "&oldpassword=" + dbhandler.convertEncodedString(edtOldPassword.getText().toString()) + "&newpassword=" + dbhandler.convertEncodedString(edtNewPassword.getText().toString()) + "";
@@ -356,7 +356,7 @@ public class FragmentProfile extends Fragment {
                                     } else {
 
                                         txtStatus.setText(str_error);
-                                        progress.setVisibility(View.GONE);
+                                       // progress.setVisibility(View.GONE);
                                         txtStatus.setVisibility(View.VISIBLE);
 
 
@@ -414,7 +414,7 @@ public class FragmentProfile extends Fragment {
 
 
                 } else {
-                    progress.setVisibility(View.GONE);
+                  // progress.setVisibility(View.GONE);
                     //txtStatus.setVisibility(View.VISIBLE);
                     //txtStatus.setText("Sorry,Try again...");
 
@@ -439,7 +439,7 @@ public class FragmentProfile extends Fragment {
         llProcess = (LinearLayout) rootView.findViewById(R.id.llProcess);
         txtStatus = (TextView) rootView.findViewById(R.id.txtStatus);
 
-        progress = (AVLoadingIndicatorView) rootView.findViewById(R.id.progress);
+       // progress = (AVLoadingIndicatorView) rootView.findViewById(R.id.progress);
 
         llUpdateUI.setVisibility(View.GONE);
 
@@ -458,7 +458,7 @@ public class FragmentProfile extends Fragment {
                 llUpdateUI.setVisibility(View.VISIBLE);
 
                 txtStatus.setVisibility(View.GONE);
-                progress.setVisibility(View.GONE);
+                //progress.setVisibility(View.GONE);
 
 
                /* profile_update.setVisible(true);

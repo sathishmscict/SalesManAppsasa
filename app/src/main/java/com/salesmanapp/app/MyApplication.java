@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -27,9 +28,9 @@ import java.security.NoSuchAlgorithmException;
 import io.fabric.sdk.android.Fabric;
 
 /**
- * Created by Ravi on 13/08/15.
+ * Created by Sathish GAdde on 13/06/17.
  */
-public class MyApplication extends Application {
+public class MyApplication extends MultiDexApplication {
 
     public static final String TAG = MyApplication.class
             .getSimpleName();
@@ -52,6 +53,7 @@ public class MyApplication extends Application {
         Fabric.with(this, new Crashlytics());
         mInstance = this;
         //Initializing firebase
+        MultiDex.install(this);
         try {
             Firebase.setAndroidContext(getApplicationContext());
 

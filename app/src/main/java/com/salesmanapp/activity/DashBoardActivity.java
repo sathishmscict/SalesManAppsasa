@@ -13,9 +13,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.CalendarContract;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -44,12 +47,25 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.salesmanapp.CalendarDemoActivity;
 import com.salesmanapp.MyFirebaseInstanceIDService;
 import com.salesmanapp.R;
 import com.salesmanapp.adapter.FollowupDataAdapterRecyclerView;
@@ -77,6 +93,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,16 +114,17 @@ public class DashBoardActivity extends AppCompatActivity
     private Menu menu;
     private MenuItem action_checkin;
     private String TAG = DashBoardActivity.class.getSimpleName();
-    private boolean CHECKIN_FLAG=false;
+    private boolean CHECKIN_FLAG = false;
     private MenuItem action_sync;
     private ImageView ivSyncAnimation;
     private dbhandler db;
     private SQLiteDatabase sd;
     private boolean doubleBackToExitPressedOnce;
 
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -130,12 +148,11 @@ public class DashBoardActivity extends AppCompatActivity
         });
 
 
-        db= new dbhandler(context);
-        sd= db.getWritableDatabase();
+        db = new dbhandler(context);
+        sd = db.getWritableDatabase();
         sd = db.getReadableDatabase();
 
         //sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER , null,null);
-
 
 
         sessionmanager = new SessionManager(getApplicationContext());
@@ -161,6 +178,155 @@ public class DashBoardActivity extends AppCompatActivity
             //getAllCartItemDetailsFromServer();
             //UpdateFcmTokenDetailsToServer();
             //setAddToCartBadget();
+
+
+            // Refer to the Java quickstart on how to setup the environment:
+// https://developers.google.com/google-apps/calendar/quickstart/java
+// Change the scope to CalendarScopes.CALENDAR and delete any stored
+// credentials.
+
+            try {
+                Event event = new Event()
+                        .setSummary("Google I/O 2015")
+                        .setLocation("800 Howard St., San Francisco, CA 94103")
+                        .setDescription("A chance to hear more about Google's developer products.");
+
+                DateTime startDateTime = new DateTime("2017-07-05T09:00:00-07:00");
+                EventDateTime start = new EventDateTime()
+                        .setDateTime(startDateTime)
+                        .setTimeZone("America/Los_Angeles");
+                event.setStart(start);
+
+                DateTime endDateTime = new DateTime("2017-07-03T17:00:00-07:00");
+                EventDateTime end = new EventDateTime()
+                        .setDateTime(endDateTime)
+                        .setTimeZone("America/Los_Angeles");
+                event.setEnd(end);
+
+                String[] recurrence = new String[]{"RRULE:FREQ=DAILY;COUNT=2"};
+                event.setRecurrence(Arrays.asList(recurrence));
+
+                EventAttendee[] attendees = new EventAttendee[]{
+                        new EventAttendee().setEmail("zealtech9teen@gmail.com"),
+                        new EventAttendee().setEmail("sathishtech9teen@gmail.com"),
+                };
+                event.setAttendees(Arrays.asList(attendees));
+
+                EventReminder[] reminderOverrides = new EventReminder[]{
+                        new EventReminder().setMethod("email").setMinutes(24 * 60),
+                        new EventReminder().setMethod("popup").setMinutes(10),
+                };
+                Event.Reminders reminders = new Event.Reminders()
+                        .setUseDefault(false)
+                        .setOverrides(Arrays.asList(reminderOverrides));
+                event.setReminders(reminders);
+
+                String calendarId = "primary";
+
+                // Initialize credentials and service object.
+                GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                        getApplicationContext(), Arrays.asList(SCOPES))
+                        .setBackOff(new ExponentialBackOff());
+                com.google.api.client.http.HttpTransport transport = AndroidHttp.newCompatibleTransport();
+                com.google.api.client.json.JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+                com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
+                        transport, jsonFactory, credential)
+                        .setApplicationName("Google Calendar API Android Quickstart")
+                        .build();
+
+                try {
+                   // event = mService.events().insert(calendarId, event).execute();
+                    System.out.printf("Event created: %s\n", event.getHtmlLink());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+              /*  // Initialize Calendar service with valid OAuth credentials
+                Calendar service = new Calendar.Builder(transport, jsonFactory, credential)
+                        .setApplicationName("applicationName").build();
+
+// Create a new calendar
+                com.google.api.services.calendar.model.Calendar calendar = new Calendar();
+                calendar.setSummary("calendarSummary");
+                calendar.setTimeZone("America/Los_Angeles");
+
+// Insert the new calendar
+                Calendar createdCalendar = service.calendars().insert(calendar).execute();
+
+                System.out.println(createdCalendar.getId());*/
+
+
+                Dexter.withActivity(DashBoardActivity.this)
+                        .withPermission(Manifest.permission.WRITE_CALENDAR)
+                        .withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse response) {
+                                try {
+                                    long start2 =Calendar.getInstance().getTimeInMillis(); // 2011-02-12 12h00
+                                    long end2 = Calendar.getInstance().getTimeInMillis()+(2*60*60);   // 2011-02-12 13h00
+
+                                    String title = "TEST ENTRY - DELETE ME!!";
+
+                                    ContentValues cvEvent = new ContentValues();
+                                    cvEvent.put("calendar_id", 1);
+                                    cvEvent.put("title", title);
+                                    cvEvent.put("dtstart", start2 );
+                                    //cvEvent.put("hasAlarm", 1);
+                                    cvEvent.put("dtend", end2);
+                                    cvEvent.put("","");
+
+
+                                    getContentResolver().insert(Uri.parse("content://com.android.calendar/events"), cvEvent);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                        }).check();
+
+
+
+
+                /////////////////////////Open intent od calendat event /////////////////////
+
+              /*  Intent intent = new Intent(Intent.ACTION_INSERT);
+                intent.setType("vnd.android.cursor.item/event");
+                intent.putExtra(CalendarContract.Events.TITLE, "Learn Android");
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, "Home suit home");
+                intent.putExtra(CalendarContract.Events.DESCRIPTION, "Download Examples");
+
+// Setting dates
+                GregorianCalendar calDate = new GregorianCalendar(2017, 07, 05);
+                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                        calDate.getTimeInMillis()+(1*60*60));
+                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
+                        calDate.getTimeInMillis()+(1*60*60));
+
+// make it a full day event
+                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+
+// make it a recurring Event
+               // intent.putExtra(CalendarContract.Events.RRULE, "FREQ=WEEKLY;COUNT=11;WKST=SU;BYDAY=TU,TH");
+
+// Making it private and shown as busy
+                intent.putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PUBLIC);
+                intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_FREE);
+
+
+
+                intent.setData(CalendarContract.Events.CONTENT_URI);
+                startActivity(intent);*/
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
             Dexter.withActivity(DashBoardActivity.this)
@@ -224,8 +390,6 @@ public class DashBoardActivity extends AppCompatActivity
                 public void onClick(View v) {
 
 
-
-
                     getMenuInflater().inflate(R.menu.activity_dashboard_drawer, menu);
                     MenuItem mProfileFrag = menu.findItem(R.id.nav_profile);
 
@@ -247,13 +411,11 @@ public class DashBoardActivity extends AppCompatActivity
         }
 
 
-
-       setupFragment(new FragmentHome(),getString(R.string.app_name));
+        setupFragment(new FragmentHome(), getString(R.string.app_name));
 
     }
 
-    private void UpdateFcmTokenDetailsToServer()
-    {
+    private void UpdateFcmTokenDetailsToServer() {
         showDialog();
 
 
@@ -263,7 +425,7 @@ public class DashBoardActivity extends AppCompatActivity
         Log.d(TAG, "URL  InsertFCMToken : " + url);
 
 
-        CustomRequest request = new CustomRequest(Request.Method.POST, url, null,new Response.Listener<JSONObject>() {
+        CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -313,146 +475,128 @@ public class DashBoardActivity extends AppCompatActivity
 
 
     }
-    private void setupLocalNotifications()
-    {
+
+    private void setupLocalNotifications() {
 
 
+        String query = "select *,fm." + dbhandler.CLIENT_DEVICE_TYPE + " as DevicType  from " + dbhandler.TABLE_FOLLOWUP_MASTER + " as fm," + dbhandler.TABLE_CLIENTMASTER + "  as cm where cm." + dbhandler.CLIENT_ID + " =fm." + dbhandler.CLIENT_ID;
+        Log.d(TAG, " Query : " + query);
+
+        Cursor c = sd.rawQuery(query, null);
+
+        Log.d(TAG, "Client Records : " + c.getCount() + "  found");
 
 
+        if (c.getCount() > 0) {
+            while (c.moveToNext()) {
 
 
-            String query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID;
-            Log.d(TAG, " Query : " + query);
+                String notifytime = c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME));
+                Log.d(TAG, "Time Before: " + notifytime);
+                notifytime = notifytime.replace(" ", ":");
+                Log.d(TAG, "Time After: " + notifytime);
 
-            Cursor c = sd.rawQuery(query, null);
+                List<String> myTimeList = new ArrayList<String>(Arrays.asList(notifytime.split(":")));
+                Log.d(TAG, "Time In List " + myTimeList.toString());
 
-            Log.d(TAG, "Client Records : " + c.getCount() + "  found");
+                Calendar calendar = Calendar.getInstance();
 
+                calendar.set(Calendar.MINUTE, Integer.parseInt(myTimeList.get(1)));
+                Log.d(TAG, "Alaram Minute :" + Integer.parseInt(myTimeList.get(1)));
+                //   calendar.set(Calendar.SECOND, 00);
+                if (myTimeList.get(2).toLowerCase().equals("am")) {
 
-            if (c.getCount() > 0)
-            {
-                while (c.moveToNext())
-                {
+                    calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                    Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                    // calendar.set(Calendar.AM_PM,Calendar.AM);
+                    Log.d(TAG, "Meridian AM");
+                    Log.d(TAG, "Meridian AM " + calendar.get(Calendar.AM_PM));
+                } else {
 
-
-                    String notifytime = c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_TIME));
-                    Log.d(TAG, "Time Before: " + notifytime);
-                    notifytime = notifytime.replace(" ", ":");
-                    Log.d(TAG, "Time After: " + notifytime);
-
-                    List<String> myTimeList = new ArrayList<String>(Arrays.asList(notifytime.split(":")));
-                    Log.d(TAG, "Time In List " + myTimeList.toString());
-
-                    Calendar calendar = Calendar.getInstance();
-
-                    calendar.set(Calendar.MINUTE, Integer.parseInt(myTimeList.get(1)));
-                    Log.d(TAG, "Alaram Minute :" + Integer.parseInt(myTimeList.get(1)));
-                    //   calendar.set(Calendar.SECOND, 00);
-                    if (myTimeList.get(2).toLowerCase().equals("am"))
-                    {
-
+                    if (Integer.parseInt(myTimeList.get(0)) == 12) {
                         calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
                         Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
-                        // calendar.set(Calendar.AM_PM,Calendar.AM);
-                        Log.d(TAG, "Meridian AM");
-                        Log.d(TAG, "Meridian AM " + calendar.get(Calendar.AM_PM));
                     } else {
-
-                        if (Integer.parseInt(myTimeList.get(0)) == 12) {
-                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
-                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
-                        } else {
-                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)) + 12);
-                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)) + 12);
-                        }
-
-                        //   calendar.set(Calendar.AM_PM,Calendar.PM);
-                        Log.d(TAG, "Meridian PM");
-                        Log.d(TAG, "Meridian PM " + calendar.get(Calendar.AM_PM));
+                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)) + 12);
+                        Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)) + 12);
                     }
-                    //calendar.set(Calendar.AM_PM,calendar.get(Calendar.AM_PM));
-                    Log.d(TAG, "Meridian AMPM " + calendar.get(Calendar.AM_PM));
 
-                    //  alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 50000, AlarmManager.INTERVAL_DAY , pendingIntent);  //set repeating every 24 hours
+                    //   calendar.set(Calendar.AM_PM,Calendar.PM);
+                    Log.d(TAG, "Meridian PM");
+                    Log.d(TAG, "Meridian PM " + calendar.get(Calendar.AM_PM));
+                }
+                //calendar.set(Calendar.AM_PM,calendar.get(Calendar.AM_PM));
+                Log.d(TAG, "Meridian AMPM " + calendar.get(Calendar.AM_PM));
 
-                    calendar.set(Calendar.SECOND, 0);
-                    calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-                    calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
-                    calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
+                //  alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 50000, AlarmManager.INTERVAL_DAY , pendingIntent);  //set repeating every 24 hours
 
-                    //Log.d(TAG , "Alarm set in " + calendar.getTimeInMillis() + " seconds, Alaram ID : "+(c.getInt(c.getColumnIndex(dbhandler.SUBTASK_ID))));
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
 
-                    Intent myIntent = new Intent(context, MyBroadcastReceiver.class);
-                    //  myIntent = new Intent(getActivity() , NotificationPublisher.class);
+                //Log.d(TAG , "Alarm set in " + calendar.getTimeInMillis() + " seconds, Alaram ID : "+(c.getInt(c.getColumnIndex(dbhandler.SUBTASK_ID))));
 
-                    Log.d(TAG, "Notification Data : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
-                    myIntent.putExtra("ALARAMID", String.valueOf(c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID))));
+                Intent myIntent = new Intent(context, MyBroadcastReceiver.class);
+                //  myIntent = new Intent(getActivity() , NotificationPublisher.class);
 
-                    long timeinMilliSeconds =  calendar.getTimeInMillis() - (15*60*1000);
-                    Log.d(TAG, "Final Time in MilliSeconds  Before : " + calendar.getTimeInMillis());
-                    Log.d(TAG, "Final Time in MilliSeconds After : " + timeinMilliSeconds);
-                    myIntent.putExtra("SATISH", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)) + ",Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + timeinMilliSeconds);
-                    myIntent.putExtra("TITLE", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
-                    myIntent.putExtra("MESSAGE", "Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)));
-                    myIntent.putExtra("NOTIFICATIONID", c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)) );
+                Log.d(TAG, "Notification Data : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
+                myIntent.putExtra("ALARAMID", String.valueOf(c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID))));
 
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID)), myIntent, 0);
+                long timeinMilliSeconds = calendar.getTimeInMillis() - (15 * 60 * 1000);
+                Log.d(TAG, "Final Time in MilliSeconds  Before : " + calendar.getTimeInMillis());
+                Log.d(TAG, "Final Time in MilliSeconds After : " + timeinMilliSeconds);
+                myIntent.putExtra("SATISH", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)) + ",Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + timeinMilliSeconds);
+                myIntent.putExtra("TITLE", c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
+                myIntent.putExtra("MESSAGE", "Meeting Regards ,  " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)));
+                myIntent.putExtra("NOTIFICATIONID", c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_ID)));
 
-                    //Log.d(TAG , " Time in Milli Seconds  "+AlarmManager.INTERVAL_DAY );
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, c.getInt(c.getColumnIndex(dbhandler.FOLLOWUP_ID)), myIntent, 0);
 
-                    //alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
-                    AlarmManager alarmManager = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+                //Log.d(TAG , " Time in Milli Seconds  "+AlarmManager.INTERVAL_DAY );
+
+                //alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
 
                                     /*long futureInMillis = SystemClock.elapsedRealtime() + calendar.getTimeInMillis();
                                     Log.d(TAG, " Future MilliSeconds : " + futureInMillis);*/
 
-                    //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
+                //alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);  //set repeating every 24 hours
 
-                    if(System.currentTimeMillis()  <= timeinMilliSeconds)
-                    {
-                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeinMilliSeconds,AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
-                        Log.d(TAG ,"Notification hasbeen set : ");
-                        Log.d(TAG, "Notification has been set : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
-
-                    }
-
-
-                    //alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+AlarmManager.INTERVAL_DAY,pendingIntent);
-                    //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
-
-                    Log.d(TAG, "Alarm set in " + calendar.getTimeInMillis() + " seconds");
-
-                    calendar.clear();
-
-
-
-
-
-
+                if (System.currentTimeMillis() <= timeinMilliSeconds) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeinMilliSeconds, AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+                    Log.d(TAG, "Notification hasbeen set : ");
+                    Log.d(TAG, "Notification has been set : " + c.getString(c.getColumnIndex(dbhandler.FOLLOWUP_DESCR)) + "," + c.getString(c.getColumnIndex(dbhandler.CLIENT_NAME)));
 
                 }
 
 
 
+                //alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+AlarmManager.INTERVAL_DAY,pendingIntent);
+                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
+
+                Log.d(TAG, "Alarm set in " + calendar.getTimeInMillis() + " seconds");
+
+                calendar.clear();
 
 
             }
 
 
+        }
 
 
     }
 
 
-    private void sendOrderDetailsToServer()
-    {
+    private void sendOrderDetailsToServer() {
         try {
 
 
             showDialog();
 
             final String url = AllKeys.WEBSITE + "InsertService";
-            Log.d(TAG, "URL InsertOrderService : "+url);
+            Log.d(TAG, "URL InsertOrderService : " + url);
 
 
             /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
@@ -472,12 +616,9 @@ public class DashBoardActivity extends AppCompatActivity
                         boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                        if (error_status == false)
-                        {
+                        if (error_status == false) {
                             Toast.makeText(context, "InsertOrderService details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
@@ -485,8 +626,7 @@ public class DashBoardActivity extends AppCompatActivity
                     }
 
 
-                    if (pDialog.isShowing())
-                    {
+                    if (pDialog.isShowing()) {
                         hideDialog();
                     }
 
@@ -540,8 +680,6 @@ public class DashBoardActivity extends AppCompatActivity
                                 jsonObject.accumulate("orderdate", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DATE)));
 
 
-
-
                                 json = json + jsonObject.toString() + ",";
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -549,7 +687,7 @@ public class DashBoardActivity extends AppCompatActivity
                         }
                         json = json.substring(0, json.length() - 1);
                         json = "[" + json + "]";
-                        Log.d(TAG , "InsertOrderService Data : "+json);
+                        Log.d(TAG, "InsertOrderService Data : " + json);
                         Log.d("Json Data : ", url + "?type=InsertOrderService&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
                         params.put("Data", json);
 
@@ -574,8 +712,7 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-    private void sendFollowupDetailsToServer()
-    {
+    private void sendFollowupDetailsToServer() {
         try {
 
 
@@ -601,12 +738,9 @@ public class DashBoardActivity extends AppCompatActivity
                         boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                        if (error_status == false)
-                        {
+                        if (error_status == false) {
                             Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
@@ -614,8 +748,7 @@ public class DashBoardActivity extends AppCompatActivity
                     }
 
 
-                    if (pDialog.isShowing())
-                    {
+                    if (pDialog.isShowing()) {
                         hideDialog();
                     }
 
@@ -661,8 +794,9 @@ public class DashBoardActivity extends AppCompatActivity
                                 jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
                                 jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
                                 jsonObject.accumulate("description", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DESCR))));
-                                jsonObject.accumulate("datetime", dbhandler.convertToJsonDateFormat(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DATE)))+" "+cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_TIME)));
-
+                                jsonObject.accumulate("datetime", dbhandler.convertToJsonDateFormat(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DATE))) + " " + cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_TIME)));
+                                jsonObject.accumulate("status", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_STATUS)));
+                                jsonObject.accumulate("reason", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_REASON)));
 
 
                                 json = json + jsonObject.toString() + ",";
@@ -672,7 +806,7 @@ public class DashBoardActivity extends AppCompatActivity
                         }
                         json = json.substring(0, json.length() - 1);
                         json = "[" + json + "]";
-                        Log.d(TAG , "InsertClientFollowup Data : "+json);
+                        Log.d(TAG, "InsertClientFollowup Data : " + json);
                         Log.d("Json Data : ", url + "?type=insertfollowup&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
                         params.put("Data", json);
 
@@ -697,8 +831,7 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-    private void sendAllClientDetailsToServer()
-    {
+    private void sendAllClientDetailsToServer() {
         try {
 
 
@@ -724,12 +857,9 @@ public class DashBoardActivity extends AppCompatActivity
                         boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                        if (error_status == false)
-                        {
+                        if (error_status == false) {
                             Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
@@ -737,8 +867,7 @@ public class DashBoardActivity extends AppCompatActivity
                     }
 
 
-                    if (pDialog.isShowing())
-                    {
+                    if (pDialog.isShowing()) {
                         hideDialog();
                     }
 
@@ -774,8 +903,7 @@ public class DashBoardActivity extends AppCompatActivity
                     params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
 
                     String json = "";
-                    if (cur.getCount() > 0)
-                    {
+                    if (cur.getCount() > 0) {
                         while (cur.moveToNext()) {
 
 
@@ -792,11 +920,11 @@ public class DashBoardActivity extends AppCompatActivity
                                 jsonObject.accumulate("address", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ADDRESS))));
                                 jsonObject.accumulate("contactperson", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NAME))));
                                 String v_front = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_FRONT));
-                                v_front = v_front.replace("http://crm.tech9teen.com/","");
+                                v_front = v_front.replace("http://crm.tech9teen.com/", "");
                                 jsonObject.accumulate("visitingfront", v_front);
 
                                 String v_back = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_BACK));
-                                v_back = v_back.replace("http://crm.tech9teen.com/","");
+                                v_back = v_back.replace("http://crm.tech9teen.com/", "");
                                 jsonObject.accumulate("visitingback", v_back);
                                 jsonObject.accumulate("createddate", cur.getString(cur.getColumnIndex(dbhandler.VISIT_DATE)));
                                 jsonObject.accumulate("latitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LATTITUDE)));
@@ -804,7 +932,6 @@ public class DashBoardActivity extends AppCompatActivity
                                 jsonObject.accumulate("clienttype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_TYPE)));
                                 jsonObject.accumulate("website", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
                                 jsonObject.accumulate("note", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NOTE))));
-
 
 
                                 json = json + jsonObject.toString() + ",";
@@ -839,8 +966,7 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-    public void backupDB()
-    {
+    public void backupDB() {
 
 
         File sd = Environment.getExternalStorageDirectory();
@@ -866,8 +992,7 @@ public class DashBoardActivity extends AppCompatActivity
         }
     }
 
-    public void setupFragment(Fragment fragment, String title)
-    {
+    public void setupFragment(Fragment fragment, String title) {
         setTitle(title);
 
         if (fragment != null) {
@@ -875,7 +1000,7 @@ public class DashBoardActivity extends AppCompatActivity
 
             FragmentManager fragmentManager = getSupportFragmentManager();
 
-          //  fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            //  fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 
@@ -902,7 +1027,6 @@ public class DashBoardActivity extends AppCompatActivity
             userDetails = sessionmanager.getSessionDetails();
             String myBase64Image = userDetails.get(SessionManager.KEY_ENODEDED_STRING);
             if (!myBase64Image.equals("")) {
-
 
 
                 Bitmap myBitmapAgain = dbhandler.decodeBase64(myBase64Image);
@@ -949,11 +1073,8 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
-    private void SetGpsCongiguration(final boolean status)
-    {
-        if (userDetails.get(SessionManager.KEY_IS_ENABLE_GPS).equals("1"))
-        {
-
+    private void SetGpsCongiguration(final boolean status) {
+        if (userDetails.get(SessionManager.KEY_IS_ENABLE_GPS).equals("1")) {
 
 
             Dexter.withActivity(DashBoardActivity.this)
@@ -967,8 +1088,7 @@ public class DashBoardActivity extends AppCompatActivity
                             CHECKIN_FLAG = true;
                             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                             // startService(new Intent(getBaseContext(), MyLocationService.class));
-                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-                            {
+                            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                                 Log.d(TAG, " Start Location updates from Background Service");
                                 startService(new Intent(getBaseContext(), MyLocationService.class));
 
@@ -987,7 +1107,6 @@ public class DashBoardActivity extends AppCompatActivity
                                     }*/
 
 
-
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setCancelable(false);
                                     builder.setTitle("Check In Information");
@@ -1001,14 +1120,13 @@ public class DashBoardActivity extends AppCompatActivity
 
                                         }
                                     });
-                                   // builder.show();
+                                    // builder.show();
 
 
                                 }
 
                             } else {
-                                if (status == true)
-                                {
+                                if (status == true) {
                                     AlertForLocationServices();
                                 }
 
@@ -1036,8 +1154,7 @@ public class DashBoardActivity extends AppCompatActivity
         }
     }
 
-    private void AlertForLocationServices()
-    {
+    private void AlertForLocationServices() {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -1099,8 +1216,6 @@ public class DashBoardActivity extends AppCompatActivity
         SetGpsCongiguration(true);
 
 
-
-
         return true;
     }
 
@@ -1112,8 +1227,7 @@ public class DashBoardActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_checkin)
-        {
+        if (id == R.id.action_checkin) {
             if (CHECKIN_FLAG == false) {
                 CHECKIN_FLAG = true;
                 SetGpsCongiguration(true);
@@ -1140,26 +1254,19 @@ public class DashBoardActivity extends AppCompatActivity
                 builder.show();
 
 
-
                 Intent intent = new Intent(DashBoardActivity.this, MyLocationService.class);
                 stopService(intent);
                 action_checkin.setIcon(R.drawable.icon_checkin_marker);
 
             }
             return true;
-        }
-        else if(id == R.id.action_search)
-        {
-            Intent intent = new Intent(context , SearchActivity.class);
+        } else if (id == R.id.action_search) {
+            Intent intent = new Intent(context, SearchActivity.class);
             startActivity(intent);
             finish();
 
 
-
-
-        }
-        else if (id == R.id.action_sync)
-        {
+        } else if (id == R.id.action_sync) {
             //GPS Tracking details
             //All client details
             Toast.makeText(context, "Send all client details to server", Toast.LENGTH_SHORT).show();
@@ -1185,8 +1292,6 @@ public class DashBoardActivity extends AppCompatActivity
             item.setActionView(ivSyncAnimation);*/
 
 
-
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -1203,30 +1308,27 @@ public class DashBoardActivity extends AppCompatActivity
 
             setupFragment(new FragmentHome(), getString(R.string.app_name));
         } else if (id == R.id.nav_followup) {
-            setupFragment(new FragmentFollowup(),"Follow up");
+            setupFragment(new FragmentFollowup(), "Follow up");
 
-        }
-        else if(id  == R.id.nav_import)
-        {
+        } else if (id == R.id.nav_import) {
             getAllClientDetailsFromServer();
 
             getAllClientFollowupDetailsFromServer();
             getAllOrderOrServiceDetailsFromServer();
 
 
-        }
+        } else if (id == R.id.nav_clients) {
 
-        else if (id  == R.id.nav_clients)
-        {
+            FragmentClients fc = new FragmentClients();
+            setupFragment(fc, "Clients");
+        } else if (id == R.id.nav_logout) {
 
-            FragmentClients fc= new FragmentClients();
-            setupFragment(fc,"Clients");
-    }
 
-        else if (id == R.id.nav_logout) {
-
-            context.deleteDatabase(dbhandler.databasename);
-            sessionmanager.logoutUser();
+            Intent intent = new Intent(context, CalendarDemoActivity.class);
+            startActivity(intent);
+            finish();
+          /*  context.deleteDatabase(dbhandler.databasename);
+            sessionmanager.logoutUser();*/
 
         }
 
@@ -1236,22 +1338,17 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
+    private void getAllOrderOrServiceDetailsFromServer() {
 
 
-    private void getAllOrderOrServiceDetailsFromServer()
-    {
-
-
-
-
-        String url  = AllKeys.WEBSITE+"ViewServiceMaster?type=service&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
-        Log.d(TAG , "URL ViewServiceMaster "+ url);
+        String url = AllKeys.WEBSITE + "ViewServiceMaster?type=service&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "";
+        Log.d(TAG, "URL ViewServiceMaster " + url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                Log.d(TAG , "Response ViewServiceMaster  : "+response);
+                Log.d(TAG, "Response ViewServiceMaster  : " + response);
 
                 try {
                     String str_error = response.getString(AllKeys.TAG_MESSAGE);
@@ -1265,19 +1362,12 @@ public class DashBoardActivity extends AppCompatActivity
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_ORDER_MASTER , null , null);
+                            sd.delete(dbhandler.TABLE_ORDER_MASTER, null, null);
 
-                            for(int i=0;i<arr.length();i++)
-                            {
-
-
-                                JSONObject c =arr.getJSONObject(i);
+                            for (int i = 0; i < arr.length(); i++) {
 
 
-
-
-
-
+                                JSONObject c = arr.getJSONObject(i);
 
 
                                 ContentValues cv = new ContentValues();
@@ -1311,23 +1401,16 @@ public class DashBoardActivity extends AppCompatActivity
                 }
 
 
-
-
-
-
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.d(TAG , "ViewServiceMaster Error "+error.getMessage());
-                if(error instanceof ServerError || error instanceof NetworkError)
-                {
+                Log.d(TAG, "ViewServiceMaster Error " + error.getMessage());
+                if (error instanceof ServerError || error instanceof NetworkError) {
 
                     hideDialog();
-                }
-                else
-                {
+                } else {
 
                     getAllOrderOrServiceDetailsFromServer();
                 }
@@ -1341,21 +1424,17 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-
-    private void getAllClientFollowupDetailsFromServer()
-    {
+    private void getAllClientFollowupDetailsFromServer() {
 
 
-
-
-        String url  = AllKeys.WEBSITE+"ViewFollowupData?type=followup&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
-        Log.d(TAG , "URL ViewFollowupData "+ url);
+        String url = AllKeys.WEBSITE + "ViewFollowupData?type=followup&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "";
+        Log.d(TAG, "URL ViewFollowupData " + url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                Log.d(TAG , "Response ViewFollowupData  : "+response);
+                Log.d(TAG, "Response ViewFollowupData  : " + response);
 
                 try {
                     String str_error = response.getString(AllKeys.TAG_MESSAGE);
@@ -1369,18 +1448,12 @@ public class DashBoardActivity extends AppCompatActivity
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER , null , null);
+                            sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, null, null);
 
-                            for(int i=0;i<arr.length();i++)
-                            {
-
-
-                                JSONObject c =arr.getJSONObject(i);
+                            for (int i = 0; i < arr.length(); i++) {
 
 
-
-
-
+                                JSONObject c = arr.getJSONObject(i);
 
 
                                 ContentValues cv = new ContentValues();
@@ -1388,10 +1461,19 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.FOLLOWUP_DATE, c.getString(AllKeys.TAG_DATE));
                                 cv.put(dbhandler.FOLLOWUP_TIME, c.getString(AllKeys.TAG_TIME));
                                 cv.put(dbhandler.FOLLOWUP_DESCR, c.getString(AllKeys.TAG_DESCRIPTION));
-                                cv.put(dbhandler.EMPLOYEE_ID,c.getString(AllKeys.TAG_EMPID));
+                                cv.put(dbhandler.EMPLOYEE_ID, c.getString(AllKeys.TAG_EMPID));
 
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, c.getString(AllKeys.TAG_DEVICETYPE));
-                                sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER ,null,cv);
+                                cv.put(dbhandler.FOLLOWUP_STATUS, c.getString(AllKeys.TAG_FOLLOWUP_STATUS));
+
+                                try {
+                                    cv.put(dbhandler.FOLLOWUP_REASON, c.getString(AllKeys.TAG_FOLLOWUP_REASON));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    cv.put(dbhandler.FOLLOWUP_REASON, "");
+                                }
+
+                                sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv);
 
 
                             }
@@ -1408,23 +1490,16 @@ public class DashBoardActivity extends AppCompatActivity
                 }
 
 
-
-
-
-
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.d(TAG , "ViewFollowupData "+error.getMessage());
-                if(error instanceof ServerError || error instanceof NetworkError)
-                {
+                Log.d(TAG, "ViewFollowupData " + error.getMessage());
+                if (error instanceof ServerError || error instanceof NetworkError) {
 
                     hideDialog();
-                }
-                else
-                {
+                } else {
 
                     getAllClientFollowupDetailsFromServer();
                 }
@@ -1438,21 +1513,17 @@ public class DashBoardActivity extends AppCompatActivity
     }
 
 
-
-    private void getAllClientDetailsFromServer()
-    {
+    private void getAllClientDetailsFromServer() {
 
 
-
-
-        String url  = AllKeys.WEBSITE+"ViewClientMst?type=clientdata&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"";
-        Log.d(TAG , "URL  "+ url);
+        String url = AllKeys.WEBSITE + "ViewClientMst?type=clientdata&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "";
+        Log.d(TAG, "URL  " + url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                Log.d(TAG , "Response  : "+response);
+                Log.d(TAG, "Response  : " + response);
 
                 try {
                     String str_error = response.getString(AllKeys.TAG_MESSAGE);
@@ -1466,19 +1537,18 @@ public class DashBoardActivity extends AppCompatActivity
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_CLIENTMASTER , null , null);
+                            sd.delete(dbhandler.TABLE_CLIENTMASTER, null, null);
 
-                            for(int i=0;i<arr.length();i++)
-                            {
+                            for (int i = 0; i < arr.length(); i++) {
 
 
-                                JSONObject c =arr.getJSONObject(i);
+                                JSONObject c = arr.getJSONObject(i);
 
                                 ContentValues cv = new ContentValues();
 
 
                                 cv.put(dbhandler.CLIENT_NAME, c.getString(AllKeys.TAG_CONTACT_PERSON_NAME));
-                                cv.put(dbhandler.CLIENT_COMPANYNAME,c.getString(AllKeys.TAG_COMPANYNAME));
+                                cv.put(dbhandler.CLIENT_COMPANYNAME, c.getString(AllKeys.TAG_COMPANYNAME));
                                 cv.put(dbhandler.CLIENT_MOBILE1, c.getString(AllKeys.TAG_MOBILE1));
                                 cv.put(dbhandler.CLIENT_MOBILE2, c.getString(AllKeys.TAG_MOBILE2));
                                 cv.put(dbhandler.CLIENT_LANDLINE, c.getString(AllKeys.TAG_LANDLINE));
@@ -1501,7 +1571,6 @@ public class DashBoardActivity extends AppCompatActivity
                                 sd.insert(dbhandler.TABLE_CLIENTMASTER, null, cv);
 
 
-
                             }
                             Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
 
@@ -1516,22 +1585,15 @@ public class DashBoardActivity extends AppCompatActivity
                 }
 
 
-
-
-
-
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                if(error instanceof ServerError || error instanceof NetworkError)
-                {
+                if (error instanceof ServerError || error instanceof NetworkError) {
 
                     hideDialog();
-                }
-                else
-                {
+                } else {
 
                     getAllClientDetailsFromServer();
                 }
@@ -1546,8 +1608,7 @@ public class DashBoardActivity extends AppCompatActivity
 
     private void showDialog() {
 
-        if(!pDialog.isShowing())
-        {
+        if (!pDialog.isShowing()) {
             pDialog.show();
 
         }
@@ -1555,8 +1616,7 @@ public class DashBoardActivity extends AppCompatActivity
 
     private void hideDialog() {
 
-        if(pDialog.isShowing())
-        {
+        if (pDialog.isShowing()) {
             pDialog.cancel();
             pDialog.dismiss();
 

@@ -90,6 +90,11 @@ public class AllKeys {
 	public static final String TAG_DATE = "date";
 	public static final String TAG_TIME = "time";
 	public static final String TAG_DESCRIPTION="description";
+	public static final String TAG_FOLLOWUP_STATUS="status";
+	public static final String TAG_FOLLOWUP_REASON="reason";
+
+
+
 
 
 	public static final String TAG_SERVICEID="serviceid";
@@ -105,6 +110,14 @@ public class AllKeys {
 	public static final String TAG_CLIENT_ID="clientid";
 	//public static final String TAG_EMPID="empid";
 	//public static final String TAG_DEVICETYPE="devicetype";
+
+
+	public static final int DEAFULT= 0;
+	public static final int YES = 1;
+	public static final int CANCEL = 2;
+	public static final int SCHEDULE =3;
+
+
 
 
 

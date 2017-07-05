@@ -22,4 +22,5 @@
     </string>
     <string name="title_activity_demo_tab">DemoTabActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_followup_response">FollowupResponseActivity</string>
 </resources>

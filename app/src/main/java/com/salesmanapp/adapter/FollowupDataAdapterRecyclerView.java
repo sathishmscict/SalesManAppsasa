@@ -36,9 +36,11 @@ import com.salesmanapp.activity.AddServicesActivity;
 import com.salesmanapp.activity.ContactUsActivity;
 import com.salesmanapp.activity.DashBoardActivity;
 import com.salesmanapp.R;
+import com.salesmanapp.activity.FollowupResponseActivity;
 import com.salesmanapp.activity.ViewClientAndFollwupDataActivity;
 import com.salesmanapp.animation.FlipAnimation;
 import com.salesmanapp.database.dbhandler;
+import com.salesmanapp.helper.AllKeys;
 import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.session.SessionManager;
 
@@ -57,19 +59,19 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
     private final dbhandler db;
     private final SQLiteDatabase sd;
     private final String displayType;
+
     private Context context;
     ArrayList<FollowupData> list_FollowupData;
     LayoutInflater inflater;
     private String TAG = FollowupDataAdapterRecyclerView.class.getSimpleName();
     private int topic_approval_status;
     private ProgressDialog pDialog;
-    private long DELAY_MILLIS=1500;
+    private long DELAY_MILLIS = 1500;
 
     private ArrayList<FollowupData> list_followups = new ArrayList<FollowupData>();
 
 
-
-    public FollowupDataAdapterRecyclerView(Context context, ArrayList<FollowupData> TestMasterData, Activity activity,String displayType) {
+    public FollowupDataAdapterRecyclerView(Context context, ArrayList<FollowupData> TestMasterData, Activity activity, String displayType) {
         this.context = context;
         this.list_FollowupData = TestMasterData;
         inflater = LayoutInflater.from(context);
@@ -82,7 +84,6 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         sd = db.getWritableDatabase();
 
         this.displayType = displayType;
-
 
 
     }
@@ -106,6 +107,8 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         private final EditText edtCompnayName;
         private final TextInputLayout edtFollowupDateWrapper;
         private final LinearLayout llMenu;
+        private final ImageView ivStatus;
+        private final EditText edtScheduleReason;
 
         public MyViewHolder(View itemView) {
 
@@ -115,22 +118,24 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
             edtNote = (EditText) itemView.findViewById(R.id.edtNote);
             edtFollowupDate = (EditText) itemView.findViewById(R.id.edtFollowupDate);
             edtFollowupTime = (EditText) itemView.findViewById(R.id.edtFollowupTime);
-            edtCompnayName = (EditText)itemView.findViewById(R.id.edtCompnayName);
-            edtFollowupDateWrapper = (TextInputLayout)itemView.findViewById(R.id.edtFollowupDateWrapper);
+            edtCompnayName = (EditText) itemView.findViewById(R.id.edtCompnayName);
+            edtFollowupDateWrapper = (TextInputLayout) itemView.findViewById(R.id.edtFollowupDateWrapper);
+
+            edtScheduleReason = (EditText) itemView.findViewById(R.id.edtScheduleReason);
 
 
-             llMenu = (LinearLayout) itemView.findViewById(R.id.llMenu);
+            ivStatus = (ImageView) itemView.findViewById(R.id.ivStatus);
 
 
-            ivLocation  = (ImageView)itemView.findViewById(R.id.ivLocation);
-            ivCall  = (ImageView)itemView.findViewById(R.id.ivCall);
-            ivServices  = (ImageView)itemView.findViewById(R.id.ivServices);
-            ivEdit  = (ImageView)itemView.findViewById(R.id.ivEdit);
-            ivDelete  = (ImageView)itemView.findViewById(R.id.ivDelete);
-            ivShow  = (ImageView)itemView.findViewById(R.id.ivShow);
+            llMenu = (LinearLayout) itemView.findViewById(R.id.llMenu);
 
 
-
+            ivLocation = (ImageView) itemView.findViewById(R.id.ivLocation);
+            ivCall = (ImageView) itemView.findViewById(R.id.ivCall);
+            ivServices = (ImageView) itemView.findViewById(R.id.ivServices);
+            ivEdit = (ImageView) itemView.findViewById(R.id.ivEdit);
+            ivDelete = (ImageView) itemView.findViewById(R.id.ivDelete);
+            ivShow = (ImageView) itemView.findViewById(R.id.ivShow);
 
 
         }
@@ -140,15 +145,12 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
     @Override
     public FollowupDataAdapterRecyclerView.MyViewHolder onCreateViewHolder(ViewGroup parent, int position) {
 
-         View view;
+        View view;
 
-        if(displayType.equals("followup") || displayType.equals("dashboard"))
-        {
+        if (displayType.equals("followup") || displayType.equals("dashboard")) {
 
             view = inflater.inflate(R.layout.row_single_followup, parent, false);
-        }
-        else
-        {
+        } else {
             view = inflater.inflate(R.layout.row_single_followup_for_other, parent, false);
 
         }
@@ -177,14 +179,57 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
         holder.edtCompnayName.setText(fd.getCompanyname());
 
+        holder.edtScheduleReason.setText(fd.getFollowup_reason());
 
 
-        if(displayType.equals("dashboard"))
-        {
+        if (fd.getFollowup_reason().equals("")) {
+            holder.edtScheduleReason.setVisibility(View.GONE);
+        } else {
+
+            holder.edtScheduleReason.setVisibility(View.VISIBLE);
+        }
+
+
+        holder.ivStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                sessionManager.setFollowupId(fd.getFollowupid());
+
+                Intent intent = new Intent(context, FollowupResponseActivity.class);
+                context.startActivity(intent);
+
+
+                Toast.makeText(activity, "Status   : " + fd.getFollowupstatus(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Toast.makeText(activity, "Status   : " + fd.getFollowupstatus(), Toast.LENGTH_SHORT).show();
+        if (fd.getFollowupstatus().equals(String.valueOf(AllKeys.YES))) {
+            holder.ivStatus.setVisibility(View.VISIBLE);
+            holder.ivStatus.setImageDrawable(context.getResources().getDrawable(R.drawable.icon_yes));
+
+        } else if (fd.getFollowupstatus().equals(String.valueOf(AllKeys.CANCEL))) {
+            holder.ivStatus.setVisibility(View.VISIBLE);
+            holder.ivStatus.setImageDrawable(context.getResources().getDrawable(R.drawable.icon_cancel));
+
+        } else if (fd.getFollowupstatus().equals(String.valueOf(AllKeys.SCHEDULE))) {
+            holder.ivStatus.setVisibility(View.VISIBLE);
+            holder.ivStatus.setImageDrawable(context.getResources().getDrawable(R.drawable.icon_schedule));
+
+        } else {
+
+            holder.ivStatus.setImageDrawable(context.getResources().getDrawable(R.drawable.icon_pending));
+
+            holder.ivStatus.setVisibility(View.VISIBLE);
+
+
+        }
+
+        if (displayType.equals("dashboard")) {
             holder.edtFollowupDateWrapper.setVisibility(View.GONE);
 
-        }else
-        {
+        } else {
             holder.edtFollowupDateWrapper.setVisibility(View.VISIBLE);
 
         }
@@ -221,13 +266,12 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
 
                         sessionManager.setClientid(fd.getClientid());
-                        Intent intent = new Intent(context , AddServicesActivity.class);
+                        Intent intent = new Intent(context, AddServicesActivity.class);
                         context.startActivity(intent);
 
 
-
                     }
-                },DELAY_MILLIS);
+                }, DELAY_MILLIS);
 
             }
         });
@@ -245,18 +289,15 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
                         try {
 
-                            sessionManager.setGPSLocations(fd.getLattitude() , fd.getLongtitude(),"");
+                            sessionManager.setGPSLocations(fd.getLattitude(), fd.getLongtitude(), "");
 
 
-                            Toast.makeText(activity, "Lattitude : "+fd.getLattitude()+" Longtitude : "+fd.getLongtitude(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Lattitude : " + fd.getLattitude() + " Longtitude : " + fd.getLongtitude(), Toast.LENGTH_SHORT).show();
 
-                            sessionManager.setGPSLocations("21.2049887","72.8385114",fd.getClientname());
+                            sessionManager.setGPSLocations("21.2049887", "72.8385114", fd.getClientname());
 
-                            Intent intent = new Intent(context , ContactUsActivity.class);
+                            Intent intent = new Intent(context, ContactUsActivity.class);
                             context.startActivity(intent);
-
-
-
 
 
                         } catch (Exception e) {
@@ -264,10 +305,9 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                         }
 
                     }
-                },DELAY_MILLIS);
+                }, DELAY_MILLIS);
             }
         });
-
 
 
         holder.ivCall.setOnClickListener(new View.OnClickListener() {
@@ -309,10 +349,8 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                                 }).check();
 
 
-
                     }
                 }, DELAY_MILLIS);
-
 
 
             }
@@ -341,16 +379,15 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
                         intent.putExtra(dbhandler.CLIENT_DEVICE_TYPE, fd.getDevicetype());
 
+                        intent.putExtra(dbhandler.FOLLOWUP_STATUS, fd.getFollowupstatus());
+
                         context.startActivity(intent);
                     }
-                },DELAY_MILLIS);
+                }, DELAY_MILLIS);
 
 
             }
         });
-
-
-
 
 
         holder.ivDelete.setOnClickListener(new View.OnClickListener() {
@@ -364,9 +401,9 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                     public void run() {
 
 
-                        sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER,""+ dbhandler.CLIENT_ID +"='"+ fd.getClientid() +"' and "+ dbhandler.FOLLOWUP_ID +"="+ fd.getFollowupid()  +"",null);
+                        sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, "" + dbhandler.CLIENT_ID + "='" + fd.getClientid() + "' and " + dbhandler.FOLLOWUP_ID + "=" + fd.getFollowupid() + "", null);
 
-                        Toast.makeText(activity, fd.getCompanyname()+"  has been deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, fd.getCompanyname() + "  has been deleted", Toast.LENGTH_SHORT).show();
                         list_FollowupData.remove(list_FollowupData.indexOf(fd));
 
 
@@ -375,22 +412,17 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
                         //notifyItemRemoved();
 
-                        if(list_FollowupData.size() == 0)
-                        {
+                        if (list_FollowupData.size() == 0) {
                             Toast.makeText(activity, "No data found", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(context , DashBoardActivity.class);
+                            Intent intent = new Intent(context, DashBoardActivity.class);
                             context.startActivity(intent);
 
 
                         }
 
 
-
-
-
-
                     }
-                },DELAY_MILLIS);
+                }, DELAY_MILLIS);
 
             }
         });
@@ -407,7 +439,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                     public void run() {
 
                         sessionManager.setClientid(fd.getClientid());
-                        Intent intent = new Intent(context , ViewClientAndFollwupDataActivity.class);
+                        Intent intent = new Intent(context, ViewClientAndFollwupDataActivity.class);
                         //Intent intent = new Intent(context , DemoTabActivity.class);
                         context.startActivity(intent);
 
@@ -504,12 +536,9 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
 
                     }
-                },DELAY_MILLIS);
+                }, DELAY_MILLIS);
             }
         });
-
-
-
 
 
     }

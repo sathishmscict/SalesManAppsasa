@@ -92,7 +92,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:inputType="numberSigned"
+                            android:inputType="numberDecimal"
 
                             android:hint="Quantity" />
                     </android.support.design.widget.TextInputLayout>
@@ -109,7 +109,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:inputType="numberSigned"
+                            android:inputType="numberDecimal"
 
                             android:hint="Rate" />
                     </android.support.design.widget.TextInputLayout>
@@ -125,7 +125,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:inputType="numberSigned"
+                            android:inputType="numberDecimal"
                             android:hint="Discount Amount" />
                     </android.support.design.widget.TextInputLayout>
 
@@ -149,7 +149,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
-                        android:inputType="numberSigned"
+                        android:inputType="numberDecimal"
                         android:hint="Net Amount" />
                 </android.support.design.widget.TextInputLayout>
 

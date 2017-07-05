@@ -7,10 +7,10 @@ package com.salesmanapp.pojo;
 public class FollowupData {
 
 
-    String followupid, followupdate,followuptime,followupnote,clientid,devicetype,website;
+    String followupid, followupdate,followuptime,followupnote,clientid,devicetype,website,followupstatus,followup_reason;
     String  clientname, moibleno1, bussiness, address, note, email, moibleno2, landline, companyname ,clienttype,lattitude,longtitude;
 
-    public FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude,String website) {
+    public FollowupData(String followupid, String followupdate, String followuptime, String followupnote, String clientid, String devicetype, String clientname, String moibleno1, String bussiness, String address, String note, String email, String moibleno2, String landline, String companyname, String clienttype, String lattitude, String longtitude,String website,String followupstatus,String followup_reason) {
         this.followupid = followupid;
         this.followupdate = followupdate;
         this.followuptime = followuptime;
@@ -30,6 +30,24 @@ public class FollowupData {
         this.lattitude = lattitude;
         this.longtitude = longtitude;
         this.website = website;
+        this.followupstatus =followupstatus;
+        this.followup_reason =followup_reason ;
+    }
+
+    public String getFollowup_reason() {
+        return followup_reason;
+    }
+
+    public void setFollowup_reason(String followup_reason) {
+        this.followup_reason = followup_reason;
+    }
+
+    public String getFollowupstatus() {
+        return followupstatus;
+    }
+
+    public void setFollowupstatus(String followupstatus) {
+        this.followupstatus = followupstatus;
     }
 
     public String getWebsite() {

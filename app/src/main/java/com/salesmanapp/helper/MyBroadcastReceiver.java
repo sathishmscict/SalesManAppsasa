@@ -12,6 +12,7 @@ import android.util.Log;
 
 
 import com.salesmanapp.database.dbhandler;
+import com.salesmanapp.session.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,6 +85,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             Log.d(TAG, "Not Schedule On Time");
         }*/
         String notid = intent.getStringExtra("NOTIFICATIONID");
+
 
 
 

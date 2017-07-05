@@ -45,6 +45,7 @@ public class SessionManager {
     public static final String KEY_ENODEDED_STRING = "Encoded_string", KEY_USER_VERIFIED_MOBILE = "IsVerifiedMobile";
 
 
+    public static final String KEY_FOLLOWUP_ID= "FollowupId";
     public static final String KEY_IS_ENABLE_GPS = "IsEnableGPS", KEY_GPS_INTERVAL = "GPSInterval";
     public static final String KEY_LATTITUDE = "Lattitude", KEY_LONGTITUDE = "Longtitude", KEY_ADDRESS = "Address", KEY_COMPANYNAME = "CompanyName";
 
@@ -108,6 +109,15 @@ public class SessionManager {
     }
 
 
+
+    public  void  setFollowupId(String followupId)
+    {
+        editor.putString(KEY_FOLLOWUP_ID , followupId);
+        editor.commit();
+
+
+
+    }
     public void setGPSLocations(String lattitude, String longtitude, String companyname) {
 
 
@@ -191,10 +201,17 @@ public class SessionManager {
     /**
      * Get stored session data
      */
-    public HashMap<String, String> getSessionDetails() {
+    public HashMap<String, String> getSessionDetails()
+    {
 
         //KEY_FULLNAME="uerfullname",KEY_USERNAME="username",KEY_EMAIL="email",KEY_MOBILE="mobileno",KEY_PHONENO="phoneno",KEY_PASSWORD="password";
         HashMap<String, String> user = new HashMap<String, String>();
+
+
+
+
+
+        user.put(KEY_FOLLOWUP_ID  , pref.getString(KEY_FOLLOWUP_ID , ""));
 
 
 

@@ -47,8 +47,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+/*import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;*/
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -258,7 +258,20 @@ public class AddClientActivity extends AppCompatActivity {
             mm = String.valueOf(month);
 
         }
-        startdate = day + "-" + mm + "-" + year;
+
+        String  str_day = "";
+        if(day <= 9 )
+        {
+
+
+            str_day = "0"+String.valueOf(day);
+        }
+        else
+        {
+            str_day = String.valueOf(str_day);
+        }
+
+        startdate = str_day + "-" + mm + "-" + year;
         edtFollowupDate.setText(startdate);
 
 
@@ -604,6 +617,8 @@ public class AddClientActivity extends AppCompatActivity {
                     cv_fallow.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                     cv_fallow.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
 
+                    cv_fallow.put(dbhandler.FOLLOWUP_STATUS, AllKeys.DEAFULT);
+                    cv_fallow.put(dbhandler.FOLLOWUP_REASON, "");
 
                     sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv_fallow);
                     cv_fallow.clear();
@@ -1005,7 +1020,8 @@ public class AddClientActivity extends AppCompatActivity {
                                     VISITING_CARD_FRONT = IMAGE_URL;
 
                                     try {
-                                        Glide.with(context).load(IMAGE_URL).error(R.mipmap.ic_launcher).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade(R.anim.slide_left, 2000).into(imgVisitingCrdFrontSide);
+                                        //Glide.with(context).load(IMAGE_URL).error(R.mipmap.ic_launcher).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade(R.anim.slide_left, 2000).into(imgVisitingCrdFrontSide);
+                                        imgVisitingCrdFrontSide.setImageBitmap(bitmap);
                                         imgVisitingCrdFrontSide.setVisibility(View.VISIBLE);
 
 
@@ -1018,7 +1034,8 @@ public class AddClientActivity extends AppCompatActivity {
 
 
                                     try {
-                                        Glide.with(context).load(IMAGE_URL).error(R.mipmap.ic_launcher).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade(R.anim.slide_left, 2000).into(imgVisitingCrdBackSide);
+                                        //Glide.with(context).load(IMAGE_URL).error(R.mipmap.ic_launcher).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade(R.anim.slide_left, 2000).into(imgVisitingCrdBackSide);
+                                        imgVisitingCrdBackSide.setImageBitmap(bitmap);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }

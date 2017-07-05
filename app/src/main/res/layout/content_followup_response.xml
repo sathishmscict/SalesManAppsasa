@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.salesmanapp.activity.FollowupResponseActivity"
+    tools:showIn="@layout/activity_followup_response">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
+        android:orientation="vertical"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnyes"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="Yes"
+
+
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:elevation="5dp"
+
+
+                />
+
+            <Button
+                android:id="@+id/btnno"
+                android:layout_width="fill_parent"
+
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="CANCEL"
+
+                android:textColor="@color/white"
+
+                android:background="@color/colorPrimary"
+
+                android:elevation="5dp"
+                />
+
+
+            <Button
+                android:id="@+id/btreschedule"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+
+                android:layout_weight="1"
+                android:text="Reschedule"
+                android:textColor="@color/white"
+
+                android:background="@color/colorPrimary"
+
+                android:elevation="5dp"
+
+                />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/llCancel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@color/viewbg" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edtCancelReasonWrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <EditText
+                        android:id="@+id/edtCancelReason"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top|left"
+                        android:hint="Cancel Reason"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:maxLines="10"
+                        android:minLines="5"
+
+                        android:singleLine="true" />
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btnsavereason"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+
+
+                android:background="@drawable/button_shape"
+                android:text="Add Reason"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/llSchedule"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/content_frame"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="1"
+
+
+                        android:orientation="vertical">
+
+                        <ScrollView
+                            android:id="@+id/scrollView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:layout_width="fill_parent"
+                                android:layout_height="0dip"
+
+
+                                android:orientation="vertical">
+
+
+                                <LinearLayout
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:layout_weight=".40"
+
+                                    android:orientation="vertical">
+
+
+                                    <LinearLayout
+
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="50dp"
+                                        android:layout_marginLeft="20dp"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="0.87"
+                                            android:src="@drawable/icon_username"
+                                            android:tint="@color/colorPrimary" />
+                                        <!--
+                                                                        <android.support.design.widget.TextInputLayout
+
+                                                                            android:id="@+id/edtNameWrapper"
+                                                                            android:layout_width="fill_parent"
+                                                                            android:layout_height="wrap_content"
+                                                                            android:layout_marginLeft="8dp"
+
+                                                                            android:layout_weight="0.13"
+                                                                            android:gravity="center|left">
+
+                                                                            <EditText
+                                                                                android:id="@+id/edtName"
+                                                                                android:layout_width="fill_parent"
+                                                                                android:layout_height="50dp"
+                                                                                android:layout_marginRight="20dp"
+                                                                                android:layout_weight="0.13"
+                                                                                android:background="@null"
+
+                                                                                android:gravity="center|left"
+                                                                                android:hint="Contact Person Name"
+                                                                                android:inputType="textCapWords"
+                                                                                android:paddingLeft="4dp"
+                                                                                android:singleLine="true"
+                                                                                android:textColor="@color/black">
+
+                                                                                <requestFocus />
+                                                                            </EditText>
+
+                                                                        </android.support.design.widget.TextInputLayout>-->
+
+                                        <Spinner
+                                            android:id="@+id/spnClients"
+
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="fill_parent"
+                                            android:layout_weight="0.13"
+                                            android:clickable="false"
+
+
+                                            android:focusable="false" />
+                                    </LinearLayout>
+
+
+                                    <View
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="1dp"
+                                        android:background="@color/viewbg" />
+
+
+                                    <LinearLayout
+                                        android:id="@+id/llFollowup"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="50dp"
+                                        android:layout_marginLeft="20dp"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="0.87"
+                                            android:src="@drawable/icon_calendar"
+                                            android:tint="@color/colorPrimary" />
+
+
+                                        <LinearLayout
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="0.13">
+
+
+                                            <android.support.design.widget.TextInputLayout
+
+                                                android:id="@+id/edtFollowupDateWrapper"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="8dp"
+                                                android:layout_weight="1"
+                                                android:gravity="center|left">
+
+
+                                                <EditText
+                                                    android:id="@+id/edtFollowupDate"
+                                                    android:layout_width="fill_parent"
+                                                    android:layout_height="50dp"
+                                                    android:layout_marginRight="20dp"
+                                                    android:layout_weight="0.13"
+                                                    android:background="@null"
+                                                    android:gravity="center|left"
+                                                    android:hint="Followup Date"
+                                                    android:inputType="textCapSentences|textMultiLine"
+                                                    android:maxLength="10"
+                                                    android:paddingLeft="4dp"
+                                                    android:singleLine="true"
+                                                    android:textColor="@color/black"
+                                                    android:visibility="visible">
+
+
+                                                </EditText>
+
+                                            </android.support.design.widget.TextInputLayout>
+
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
+
+                                    <View
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="1dp"
+                                        android:background="@color/viewbg" />
+
+                                    <LinearLayout
+                                        android:id="@+id/llFolloup"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="50dp"
+                                        android:layout_marginLeft="20dp"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="0.87"
+                                            android:src="@drawable/icon_clock"
+                                            android:tint="@color/colorPrimary" />
+
+
+                                        <LinearLayout
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="0.13">
+
+
+                                            <android.support.design.widget.TextInputLayout
+
+                                                android:id="@+id/edtFollowupTimeWrapper"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginLeft="8dp"
+                                                android:layout_weight="1"
+                                                android:gravity="center|left">
+
+
+                                                <EditText
+                                                    android:id="@+id/edtFollowupTime"
+                                                    android:layout_width="fill_parent"
+                                                    android:layout_height="50dp"
+                                                    android:layout_marginRight="20dp"
+                                                    android:layout_weight="0.13"
+                                                    android:background="@null"
+                                                    android:gravity="center|left"
+                                                    android:hint="Followup Time"
+                                                    android:inputType="textCapWords"
+                                                    android:maxLength="8"
+                                                    android:paddingLeft="4dp"
+                                                    android:singleLine="true"
+                                                    android:textColor="@color/black"
+                                                    android:visibility="visible">
+
+
+                                                </EditText>
+
+                                            </android.support.design.widget.TextInputLayout>
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
+
+                                    <View
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="1dp"
+                                        android:background="@color/viewbg" />
+
+                                    <LinearLayout
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="20dp"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="0.87"
+                                            android:src="@drawable/icon_notepad"
+                                            android:tint="@color/colorPrimary" />
+
+                                        <android.support.design.widget.TextInputLayout
+
+                                            android:id="@+id/edtNoteWrapper"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginLeft="8dp"
+                                            android:layout_weight="0.13"
+                                            android:gravity="center|left|top">
+
+
+                                            <EditText
+                                                android:id="@+id/edtNote"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="fill_parent"
+                                                android:layout_marginRight="20dp"
+                                                android:layout_weight="0.13"
+
+                                                android:background="@null"
+                                                android:gravity="center|left|top"
+                                                android:hint="Note"
+                                                android:inputType="textCapSentences|textMultiLine"
+                                                android:maxLines="4"
+                                                android:minLines="3"
+                                                android:paddingLeft="4dp"
+                                                android:paddingTop="4dp"
+                                                android:textColor="@color/black"
+                                                android:visibility="visible">
+
+
+                                            </EditText>
+
+                                        </android.support.design.widget.TextInputLayout>
+                                    </LinearLayout>
+
+                                    <View
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="1dp"
+                                        android:background="@color/viewbg" />
+
+
+                                    <LinearLayout
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="20dp"
+                                        android:orientation="horizontal">
+
+                                        <ImageView
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_gravity="center"
+                                            android:layout_weight="0.87"
+                                            android:src="@drawable/icon_notepad"
+                                            android:tint="@color/colorPrimary" />
+
+                                        <android.support.design.widget.TextInputLayout
+
+                                            android:id="@+id/edtscheduleReasonWrapper"
+                                            android:layout_width="fill_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginLeft="8dp"
+                                            android:layout_weight="0.13"
+                                            android:gravity="center|left|top">
+
+
+                                            <EditText
+                                                android:id="@+id/edtSchedule"
+                                                android:layout_width="fill_parent"
+                                                android:layout_height="fill_parent"
+                                                android:layout_marginRight="20dp"
+                                                android:layout_weight="0.13"
+
+                                                android:background="@null"
+                                                android:gravity="center|left|top"
+                                                android:hint="Reschedule Reason"
+                                                android:inputType="textCapSentences|textMultiLine"
+                                                android:maxLines="4"
+                                                android:minLines="3"
+                                                android:paddingLeft="4dp"
+                                                android:paddingTop="4dp"
+                                                android:textColor="@color/black"
+                                                android:visibility="visible">
+
+
+                                            </EditText>
+
+                                        </android.support.design.widget.TextInputLayout>
+                                    </LinearLayout>
+
+                                    <View
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="1dp"
+                                        android:background="@color/viewbg" />
+
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </ScrollView>
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/linearLayout2"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:background="@color/colorAccent">
+
+                            <Button
+                                android:id="@+id/btnsave"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+
+                                android:layout_alignParentBottom="true"
+
+
+                                android:background="@drawable/button_shape"
+                                android:text="Schedule Followup"
+                                android:textColor="@color/white" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+
+            </FrameLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

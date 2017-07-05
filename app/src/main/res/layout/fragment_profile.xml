@@ -116,7 +116,7 @@
                             android:background="@color/colorPrimaryDark"
                             android:src="@drawable/icon_edit_camera" />
 
-                        <de.hdodenhof.circleimageview.CircleImageView
+                       <!-- <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/imgProfilePic"
                             android:layout_width="140dp"
 
@@ -125,7 +125,19 @@
                             android:layout_marginTop="5dp"
                             android:src="@drawable/icon_userlogo"
                             app:civ_border_color="@color/colorPrimaryDark"
-                            app:civ_border_width="2dp" />
+                            app:civ_border_width="2dp" />-->
+
+                        <com.github.siyamed.shapeimageview.CircularImageView
+                            android:id="@+id/imgProfilePic"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="5dp"
+                            android:src="@drawable/icon_userlogo"
+                            app:siBorderColor="@color/colorPrimaryDark"
+
+                            app:siBorderWidth="2dp" />
+
 
 
                     </FrameLayout>
@@ -591,7 +603,7 @@ android:visibility="gone"
                                     android:layout_height="wrap_content"
                                     android:orientation="vertical">
 
-                                    <com.wang.avi.AVLoadingIndicatorView
+                                <!--    <com.wang.avi.AVLoadingIndicatorView
                                         android:id="@+id/progress"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -602,7 +614,7 @@ android:visibility="gone"
                                         app:indicatorName="BallPulseIndicator"
 
 
-                                        />
+                                        />-->
 
                                     <TextView
                                         android:id="@+id/txtStatus"
