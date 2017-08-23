@@ -351,6 +351,8 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                         intent.putExtra(dbhandler.CLIENT_DEVICE_TYPE, cd.getDevicetype());
                         intent.putExtra(dbhandler.CLIENT_WEBSITE, cd.getWebsite());
 
+                        intent.putExtra(dbhandler.CLIENT_VISITING_CARD_FRONT, cd.getVisitingcardfront());
+                        intent.putExtra(dbhandler.CLIENT_VISITING_CARD_BACK, cd.getVisitingcardback());
                         context.startActivity(intent);
                     }
                 },DELAY_MILLIS);

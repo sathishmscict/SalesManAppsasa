@@ -67,6 +67,7 @@ import com.salesmanapp.helper.CustomRequest;
 import com.salesmanapp.helper.ImageUtils;
 import com.salesmanapp.helper.NetConnectivity;
 import com.salesmanapp.session.SessionManager;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -334,6 +335,44 @@ public class AddClientActivity extends AppCompatActivity {
                 String followupdate = ii.getStringExtra(dbhandler.FOLLOWUP_DATE);
                 String followuptime = ii.getStringExtra(dbhandler.FOLLOWUP_TIME);
                 String website = ii.getStringExtra(dbhandler.CLIENT_WEBSITE);
+                try {
+                    VISITING_CARD_FRONT = ii.getStringExtra(dbhandler.CLIENT_VISITING_CARD_FRONT);
+
+
+                    if(!VISITING_CARD_FRONT.equals(""))
+                    {
+                        Picasso.with(context)
+                                .load(VISITING_CARD_FRONT)
+                    /*.placeholder(R.drawable.app_logo)
+                    .error(R.drawable.app_logo)*/
+                                .into(imgVisitingCrdFrontSide);
+
+
+
+                        imgVisitingCrdFrontSide.setVisibility(View.VISIBLE);
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    VISITING_CARD_BACK= ii.getStringExtra(dbhandler.CLIENT_VISITING_CARD_BACK);
+                    if(!VISITING_CARD_BACK.equals(""))
+                    {
+                        Picasso.with(context)
+                                .load(VISITING_CARD_BACK)
+                    /*.placeholder(R.drawable.app_logo)
+                    .error(R.drawable.app_logo)*/
+                                .into(imgVisitingCrdBackSide);
+                        imgVisitingCrdBackSide.setVisibility(View.VISIBLE);
+
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
 
 
 
@@ -593,7 +632,8 @@ public class AddClientActivity extends AppCompatActivity {
 
 
                 cv.put(dbhandler.SYNC_STATUS, "0");
-
+                cv.put(dbhandler.CLIENT_VISITING_CARD_FRONT,VISITING_CARD_FRONT);
+                cv.put(dbhandler.CLIENT_VISITING_CARD_BACK,VISITING_CARD_BACK);
                 sd.update(dbhandler.TABLE_CLIENTMASTER, cv, "" + dbhandler.CLIENT_ID + "='" + getIntent().getStringExtra(dbhandler.CLIENT_ID) + "' and " + dbhandler.CLIENT_DEVICE_TYPE + "='" + getIntent().getStringExtra(dbhandler.CLIENT_DEVICE_TYPE) + "'", null);
 
                 Snackbar.make(coordinatelayout, "Client details has been updated successfully", Snackbar.LENGTH_SHORT).show();

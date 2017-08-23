@@ -9,7 +9,7 @@ public class ClientData {
     String clientid, clientname, moibleno1, bussiness, address, note, email, moibleno2, landline, companyname, devicetype,clienttype,lattitude,longtitude,visitingcardfront,visitingcardback,website;
 
 
-    public ClientData(String clientid, String clientname, String moibleno, String bussiness, String address, String note, String email, String mobile2, String landline, String compname, String devicetype,String clienttype,String lattitude,String longtitude,String website) {
+    public ClientData(String clientid, String clientname, String moibleno, String bussiness, String address, String note, String email, String mobile2, String landline, String compname, String devicetype,String clienttype,String lattitude,String longtitude,String website,String visitingcardfront,String visitingcardback) {
         this.clientid = clientid;
         this.clientname = clientname;
         this.moibleno1 = moibleno;
@@ -25,6 +25,8 @@ public class ClientData {
         this.lattitude = lattitude;
         this.longtitude = longtitude;
         this.website = website;
+        this.visitingcardfront = visitingcardfront;
+        this.visitingcardback = visitingcardback;
 
 
     }
