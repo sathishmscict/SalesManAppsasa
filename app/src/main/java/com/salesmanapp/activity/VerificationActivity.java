@@ -317,6 +317,7 @@ public class VerificationActivity extends AppCompatActivity {
                         "1");
 
                 Intent intent = new Intent(context , DashBoardActivity.class);
+                intent.putExtra("ISFIRSTTIME","1");
                 startActivity(intent);
                 finish();
 

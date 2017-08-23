@@ -18,14 +18,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.salesmanapp.app.MyApplication;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.helper.AllKeys;
+import com.salesmanapp.helper.CustomRequest;
 import com.salesmanapp.session.SessionManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,10 +37,14 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Satish Gadde on 25-10-2016.
@@ -74,7 +82,7 @@ public class MyLocationService extends Service implements GoogleApiClient.Connec
 
     //private static final String TAG = MyLocationService.class.getSimpleName();
     private LocationManager mLocationManager = null;
-    private int LOCATION_INTERVAL = 1000 * 10;
+    private int LOCATION_INTERVAL = 1000 * 60;
     private static final float LOCATION_DISTANCE = 0;//10
     private SessionManager sessionManager;
     HashMap<String, String> userDetails = new HashMap<String, String>();
@@ -135,7 +143,7 @@ public class MyLocationService extends Service implements GoogleApiClient.Connec
 
             List<Address> addresses = null; // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             try {
-                sessionManager.setGPSLocations(String.valueOf(location.getLatitude()) , String.valueOf(location.getLongitude()),"");
+                sessionManager.setGPSLocations(String.valueOf(location.getLatitude()), String.valueOf(location.getLongitude()), "");
                 addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                 Log.d(TAG, " Address : " + addresses.toString());
             } catch (IOException e) {
@@ -143,117 +151,221 @@ public class MyLocationService extends Service implements GoogleApiClient.Connec
                 Log.d(TAG, "Error in converting lattitude & Longtitude to address : " + e.getMessage());
 
 
-
-
             }
 
 
-            if (addresses != null)
-            {
+            try {
+                if (addresses != null) {
 
-                String address = "" + addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                Log.d(TAG, "Address 1: " + address);
-                String city = "" + addresses.get(0).getLocality();
-                String state = "" + addresses.get(0).getAdminArea();
-                String country = "" + addresses.get(0).getCountryName();
-                String postalCode = "" + addresses.get(0).getPostalCode();
-                String knownName = "" + addresses.get(0).getFeatureName(); // Only if available else return NULL
-
-
-                String FullAddress = "";
-                if (!address.equals("")) {
-
-                    FullAddress = FullAddress + address;
-
-                }
-                if (!city.equals("")) {
-
-                    FullAddress = FullAddress + "," + city;
-                }
-                if (!state.equals("")) {
-
-                    FullAddress = FullAddress + "," + state;
-                }
-                if (!country.equals("")) {
-
-                    FullAddress = FullAddress + "," + country;
-
-                }
-
-                if (!postalCode.equals("")) {
-
-                    FullAddress = FullAddress + "," + postalCode;
-                }
-                if (!knownName.equals("")) {
-
-                    FullAddress = FullAddress + "," + knownName;
-                }
-
-                if (knownName.length() < 7) {
-                    knownName = knownName + address;
-                }
-                String url_sendlocation = AllKeys.WEBSITE + "InsertStudentLocation?type=insertlocation&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&lattitude=" + location.getLatitude() + "&longtitude=" + location.getLongitude() + "&date=" + CurrentDate + "&time=" + CurrentTime + "&knownname=" + dbhandler.convertEncodedString(knownName) + "&address=" + dbhandler.convertEncodedString(FullAddress) + "";
-                //url_sendlocation = AllKeys.WEBSITE + "ServiceT.asmx/InsertFacultyLocation?type=insertlocation&facultyid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&lattitude=" + location.getLatitude() + "&longtitude=" + location.getLongitude() + "&date=" + CurrentDate + "&time=" + CurrentTime + "&address=" + dbhandler.convertEncodedString(FullAddress) + "&knownname=" + dbhandler.convertEncodedString(knownName) + "&clientid=0";
-                url_sendlocation = AllKeys.WEBSITE+"InsertGprsData?type=gprs&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"&datetime="+ CurrentDate+" "+CurrentTime +"&latitude="+ location.getLatitude() +"&longitude="+ location.getLongitude() +"";
+                    String address = null; // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                    String city = null;
+                    String state = null;
+                    String country = null;
+                    String postalCode = null;
+                    String knownName = null; // Only if available else return NULL
+                    try {
+                        address = "" + addresses.get(0).getAddressLine(0);
+                        Log.d(TAG, "Address 1: " + address);
+                        city = "" + addresses.get(0).getLocality();
+                        state = "" + addresses.get(0).getAdminArea();
+                        country = "" + addresses.get(0).getCountryName();
+                        postalCode = "" + addresses.get(0).getPostalCode();
+                        knownName = "" + addresses.get(0).getFeatureName();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
 
-                Log.d(TAG, "URL Send Faculty Location : " + url_sendlocation);
+                    String FullAddress = "";
+                    if (!address.equals("")) {
 
-
-                StringRequest str_sendlocation = new StringRequest(Request.Method.GET, url_sendlocation, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-
-                        Log.d(TAG, "InsertFacultyLocation Response : " + response.toString());
-
-                        ContentValues cv = new ContentValues();
-                        cv.put(dbhandler.LOCATION_SYNC_STATUS, "1");
-                        cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
-                        cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
-                        cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
-
-                        sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
-                        cv.clear();
-
-                        Log.d(TAG, "Inserted as 1");
-
-
+                        FullAddress = FullAddress + address;
 
                     }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "InsertFacultyLocation Error : " + error.getMessage());
+                    if (!city.equals("")) {
 
-                        if(error instanceof NetworkError)
-                        {
+                        FullAddress = FullAddress + "," + city;
+                    }
+                    if (!state.equals("")) {
+
+                        FullAddress = FullAddress + "," + state;
+                    }
+                    if (!country.equals("")) {
+
+                        FullAddress = FullAddress + "," + country;
+
+                    }
+
+                    if (!postalCode.equals("")) {
+
+                        FullAddress = FullAddress + "," + postalCode;
+                    }
+                    if (!knownName.equals("")) {
+
+                        FullAddress = FullAddress + "," + knownName;
+                    }
+
+                    if (knownName.length() < 7) {
+                        knownName = knownName + address;
+                    }
+                    String url_sendlocation = AllKeys.WEBSITE + "InsertStudentLocation?type=insertlocation&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&lattitude=" + location.getLatitude() + "&longtitude=" + location.getLongitude() + "&date=" + CurrentDate + "&time=" + CurrentTime + "&knownname=" + dbhandler.convertEncodedString(knownName) + "&address=" + dbhandler.convertEncodedString(FullAddress) + "";
+                    //url_sendlocation = AllKeys.WEBSITE + "ServiceT.asmx/InsertFacultyLocation?type=insertlocation&facultyid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&lattitude=" + location.getLatitude() + "&longtitude=" + location.getLongitude() + "&date=" + CurrentDate + "&time=" + CurrentTime + "&address=" + dbhandler.convertEncodedString(FullAddress) + "&knownname=" + dbhandler.convertEncodedString(knownName) + "&clientid=0";
+                    url_sendlocation = AllKeys.WEBSITE + "InsertGprsData?type=gps&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&datetime=" + CurrentDate + " " + CurrentTime + "&latitude=" + location.getLatitude() + "&longitude=" + location.getLongitude() + "";
+
+                    url_sendlocation  =AllKeys.WEBSITE+"InsertGPSLocationData";
+
+                    Log.d(TAG, "URL Send Faculty Location : " + url_sendlocation);
+
+
+                   // final String finalUrl_sendlocation = url_sendlocation;
+                    final String finalUrl_sendlocation = url_sendlocation;
+                    CustomRequest request = new CustomRequest(Request.Method.POST, finalUrl_sendlocation, null, new Response.Listener<JSONObject>() {
+
+
+                            @Override
+                        public void onResponse(JSONObject response) {
+
+                            Log.d(TAG, "InsertGPSLocationData Response : " + response.toString());
+
+
+                            try {
+                                String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                                String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                                boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                                boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+
+
+                                if (error_status == false) {
+
+                                    ContentValues cv = new ContentValues();
+                                    cv.put(dbhandler.SYNC_STATUS, "1");
+                                    cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
+                                    cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
+                                    cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
+
+                                    sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
+                                    cv.clear();
+
+                                    Log.d(TAG, "Inserted as 1");
+                                }
+                            } catch (Exception e) {
+                                Log.d(TAG, "Error : " + e.getMessage());
+
+                            }
+
+
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (error instanceof NetworkError  || error instanceof ServerError) {
+                                ContentValues cv = new ContentValues();
+                                cv.put(dbhandler.SYNC_STATUS, "0");
+                                cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
+                                cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
+                                cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
+                                sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
+                                cv.clear();
+                                Log.d(TAG, "Inserted as 0");
+
+                            }
+
+                        }
+                    }) {
+                        @Override
+                        protected Map<String, String> getParams() {
+
+                            HashMap<String, String> params = new HashMap<String, String>();
+
+
+                            params.put("type", "insertgps");
+
+                            params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
+
+                            String json = "";
+                            try {
+                                JSONObject jsonObject = new JSONObject();
+
+                                jsonObject.accumulate("datetime", dbhandler.getDateTime());
+                                jsonObject.accumulate("lattitude", location.getLatitude());
+                                jsonObject.accumulate("longtitude", location.getLongitude());
+
+                                json = "[" + json + jsonObject.toString() + "]";
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+
+                            }
+
+
+                            params.put("Data", json);
+
+                            Log.d("Json Data : ", finalUrl_sendlocation + "?type=insertgps&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
+
+
+                            return params;
+                        }
+                    };
+                    MyApplication.getInstance().addToRequestQueue(request);
+
+
+
+             /*       StringRequest str_sendlocation = new StringRequest(Request.Method.GET, url_sendlocation, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+
+                            Log.d(TAG, "InsertFacultyLocation Response : " + response.toString());
+
                             ContentValues cv = new ContentValues();
-                            cv.put(dbhandler.LOCATION_SYNC_STATUS, "0");
+                            cv.put(dbhandler.SYNC_STATUS, "1");
                             cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
                             cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
                             cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
+
                             sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
                             cv.clear();
-                            Log.d(TAG, "Inserted as 0");
+
+                            Log.d(TAG, "Inserted as 1");
+
+
 
                         }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, "InsertFacultyLocation Error : " + error.getMessage());
 
-                    }
-                });
-                MyApplication.getInstance().addToRequestQueue(str_sendlocation);
+                            if(error instanceof NetworkError)
+                            {
+                                ContentValues cv = new ContentValues();
+                                cv.put(dbhandler.SYNC_STATUS, "0");
+                                cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
+                                cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
+                                cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
+                                sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
+                                cv.clear();
+                                Log.d(TAG, "Inserted as 0");
 
-            }
-            else
-            {
-                ContentValues cv = new ContentValues();
-                cv.put(dbhandler.LOCATION_SYNC_STATUS, "0");
-                cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
-                cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
-                cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
-                sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
-                cv.clear();
-                Log.d(TAG, "Inserted as 0");
+                            }
+
+                        }
+                    });
+                    //Remove comment after fix the insert issue
+                    MyApplication.getInstance().addToRequestQueue(str_sendlocation);*/
+
+                } else {
+                    ContentValues cv = new ContentValues();
+                    cv.put(dbhandler.SYNC_STATUS, "0");
+                    cv.put(dbhandler.LOCATION_LATTITUDE, location.getLatitude());
+                    cv.put(dbhandler.LOCATION_LONGTITUDE, location.getLongitude());
+                    cv.put(dbhandler.LOCATION_TIME, dbhandler.getDateTime());
+                    sd.insert(dbhandler.TABLE_LOCATION_MASTER, null, cv);
+                    cv.clear();
+                    Log.d(TAG, "Inserted as 0");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
 

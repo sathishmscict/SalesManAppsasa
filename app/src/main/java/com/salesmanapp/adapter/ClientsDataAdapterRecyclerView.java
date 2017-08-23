@@ -26,6 +26,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -40,18 +44,26 @@ import com.salesmanapp.R;
 import com.salesmanapp.activity.DemoTabActivity;
 import com.salesmanapp.activity.ViewClientAndFollwupDataActivity;
 import com.salesmanapp.animation.FlipAnimation;
+import com.salesmanapp.app.MyApplication;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.fragments.FragmentHome;
 import com.salesmanapp.fragments.FragmentSpecificDate;
 import com.salesmanapp.fragments.FragmentToday;
 import com.salesmanapp.fragments.FragmentTomorrow;
 import com.salesmanapp.fragments.FragmentYesterday;
+import com.salesmanapp.helper.AllKeys;
+import com.salesmanapp.helper.NetConnectivity;
 import com.salesmanapp.pojo.ClientData;
 import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.session.SessionManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import dmax.dialog.SpotsDialog;
 
 /**
  * Created by Satish Gadde on 19-08-2016.
@@ -64,6 +76,7 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
     private final Activity activity;
     private final dbhandler db;
     private final SQLiteDatabase sd;
+    private final SpotsDialog spotsDialog;
     private Context context;
     ArrayList<ClientData> list_ClientsData;
     LayoutInflater inflater;
@@ -85,6 +98,9 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
         db = new dbhandler(context);
         sd = db.getWritableDatabase();
+
+        spotsDialog = new SpotsDialog(context);
+        spotsDialog.setCancelable(false);
 
 
     }
@@ -391,25 +407,90 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
                     public void run() {
 
 
-                        sd.delete(dbhandler.TABLE_CLIENTMASTER,""+ dbhandler.CLIENT_ID +"='"+ cd.getClientid() +"' and "+ dbhandler.CLIENT_DEVICE_TYPE +"='"+ cd.getDevicetype() +"'",null);
-
-                        Toast.makeText(activity, cd.getCompanyname()+" has been deleted", Toast.LENGTH_SHORT).show();                        //notifyItemRemoved();
-
-                        list_ClientsData.remove(list_ClientsData.indexOf(cd));
-
-
-                        notifyDataSetChanged();
-
-
-
-                        if(list_ClientsData.size() == 0)
+                        if (NetConnectivity.isOnline(context))
                         {
-                            Toast.makeText(activity, "No data found", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(context , DashBoardActivity.class);
-                            context.startActivity(intent);
 
+
+                            showDialog();
+
+                            String url_delete_client = AllKeys.WEBSITE + "DeleteClientRecord?type=deleteclient&empid="+ userDetails.get(SessionManager.KEY_EMP_ID) +"&clientid="+ cd.getClientid() +"";
+                            Log.d(TAG ,  " Delete ClientRecord : "+url_delete_client);
+                            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url_delete_client, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+
+
+                                    Log.d(TAG , "Delete Client Resposne : "+response.toString());
+                                    try {
+                                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+
+                                        if (error_status == false)
+                                        {
+
+
+                                            sd.delete(dbhandler.TABLE_CLIENTMASTER,""+ dbhandler.CLIENT_ID +"='"+ cd.getClientid() +"' and "+ dbhandler.CLIENT_DEVICE_TYPE +"='"+ cd.getDevicetype() +"'",null);
+
+                                            Toast.makeText(activity, cd.getCompanyname()+" has been deleted", Toast.LENGTH_SHORT).show();                        //notifyItemRemoved();
+
+                                            list_ClientsData.remove(list_ClientsData.indexOf(cd));
+
+
+                                            notifyDataSetChanged();
+
+
+
+                                            hideDialog();
+                                            if(list_ClientsData.size() == 0)
+                                            {
+                                                Toast.makeText(activity, "No data found", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(context , DashBoardActivity.class);
+                                                context.startActivity(intent);
+
+
+                                            }
+
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        hideDialog();
+                                    }
+
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+
+                                    Toast.makeText(activity, "Errro : " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    hideDialog();
+                                }
+                            });
+                            MyApplication.getInstance().addToRequestQueue(request);
+
+
+                        } else {
+                            Toast.makeText(activity, context.getString(R.string.no_network3), Toast.LENGTH_SHORT).show();
 
                         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                     }
                 },DELAY_MILLIS);
@@ -558,6 +639,32 @@ public class ClientsDataAdapterRecyclerView extends RecyclerView.Adapter<Clients
 
 
     }
+
+    private void hideDialog() {
+        try {
+            if (spotsDialog.isShowing()) {
+                spotsDialog.hide();
+                spotsDialog.dismiss();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showDialog() {
+        try {
+            if (!spotsDialog.isShowing()) {
+                spotsDialog.show();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
 
 }

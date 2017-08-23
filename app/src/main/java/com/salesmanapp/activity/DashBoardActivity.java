@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -97,6 +98,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import dmax.dialog.SpotsDialog;
 
@@ -121,7 +123,7 @@ public class DashBoardActivity extends AppCompatActivity
     private SQLiteDatabase sd;
     private boolean doubleBackToExitPressedOnce;
 
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +156,8 @@ public class DashBoardActivity extends AppCompatActivity
 
         //sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER , null,null);
 
+       // sd.execSQL("delete from "+ dbhandler.TABLE_LOCATION_MASTER +" where "+ dbhandler.SYNC_STATUS +"='0'");
+
 
         sessionmanager = new SessionManager(getApplicationContext());
         userDetails = sessionmanager.getSessionDetails();
@@ -179,6 +183,28 @@ public class DashBoardActivity extends AppCompatActivity
             //UpdateFcmTokenDetailsToServer();
             //setAddToCartBadget();
 
+            /**
+             * Load all data from server if user login first time
+             */
+
+            try {
+                if (getIntent().getStringExtra("ISFIRSTTIME").equals("1")) {
+
+                    getAllClientDetailsFromServer();
+
+                    getAllClientFollowupDetailsFromServer();
+                    getAllOrderOrServiceDetailsFromServer();
+
+                }
+
+            } catch (Exception e) {
+                sendAllClientDetailsToServer();
+                sendFollowupDetailsToServer();
+                sendOrderDetailsToServer();
+                sendGPSLocationDetaislToServer();
+                e.printStackTrace();
+            }
+
 
             // Refer to the Java quickstart on how to setup the environment:
 // https://developers.google.com/google-apps/calendar/quickstart/java
@@ -186,97 +212,77 @@ public class DashBoardActivity extends AppCompatActivity
 // credentials.
 
             try {
-                Event event = new Event()
-                        .setSummary("Google I/O 2015")
-                        .setLocation("800 Howard St., San Francisco, CA 94103")
-                        .setDescription("A chance to hear more about Google's developer products.");
 
-                DateTime startDateTime = new DateTime("2017-07-05T09:00:00-07:00");
-                EventDateTime start = new EventDateTime()
-                        .setDateTime(startDateTime)
-                        .setTimeZone("America/Los_Angeles");
-                event.setStart(start);
 
-                DateTime endDateTime = new DateTime("2017-07-03T17:00:00-07:00");
-                EventDateTime end = new EventDateTime()
-                        .setDateTime(endDateTime)
-                        .setTimeZone("America/Los_Angeles");
-                event.setEnd(end);
 
-                String[] recurrence = new String[]{"RRULE:FREQ=DAILY;COUNT=2"};
-                event.setRecurrence(Arrays.asList(recurrence));
 
-                EventAttendee[] attendees = new EventAttendee[]{
-                        new EventAttendee().setEmail("zealtech9teen@gmail.com"),
-                        new EventAttendee().setEmail("sathishtech9teen@gmail.com"),
-                };
-                event.setAttendees(Arrays.asList(attendees));
 
-                EventReminder[] reminderOverrides = new EventReminder[]{
-                        new EventReminder().setMethod("email").setMinutes(24 * 60),
-                        new EventReminder().setMethod("popup").setMinutes(10),
-                };
-                Event.Reminders reminders = new Event.Reminders()
-                        .setUseDefault(false)
-                        .setOverrides(Arrays.asList(reminderOverrides));
-                event.setReminders(reminders);
-
-                String calendarId = "primary";
-
-                // Initialize credentials and service object.
-                GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                        getApplicationContext(), Arrays.asList(SCOPES))
-                        .setBackOff(new ExponentialBackOff());
-                com.google.api.client.http.HttpTransport transport = AndroidHttp.newCompatibleTransport();
-                com.google.api.client.json.JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-                com.google.api.services.calendar.Calendar mService = new com.google.api.services.calendar.Calendar.Builder(
-                        transport, jsonFactory, credential)
-                        .setApplicationName("Google Calendar API Android Quickstart")
-                        .build();
-
-                try {
-                   // event = mService.events().insert(calendarId, event).execute();
-                    System.out.printf("Event created: %s\n", event.getHtmlLink());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-              /*  // Initialize Calendar service with valid OAuth credentials
-                Calendar service = new Calendar.Builder(transport, jsonFactory, credential)
-                        .setApplicationName("applicationName").build();
-
-// Create a new calendar
-                com.google.api.services.calendar.model.Calendar calendar = new Calendar();
-                calendar.setSummary("calendarSummary");
-                calendar.setTimeZone("America/Los_Angeles");
-
-// Insert the new calendar
-                Calendar createdCalendar = service.calendars().insert(calendar).execute();
-
-                System.out.println(createdCalendar.getId());*/
-
+/*
 
                 Dexter.withActivity(DashBoardActivity.this)
                         .withPermission(Manifest.permission.WRITE_CALENDAR)
-                        .withListener(new PermissionListener() {
+                        .withListener(new PermissionListener()
+                        {
                             @Override
                             public void onPermissionGranted(PermissionGrantedResponse response) {
                                 try {
-                                    long start2 =Calendar.getInstance().getTimeInMillis(); // 2011-02-12 12h00
-                                    long end2 = Calendar.getInstance().getTimeInMillis()+(2*60*60);   // 2011-02-12 13h00
 
-                                    String title = "TEST ENTRY - DELETE ME!!";
+                                    int calenderId = -1;
+                                    String calenderEmaillAddress = "sathishtech9teen@gmail.com";
+                                    String[] projection = new String[]{
+                                            CalendarContract.Calendars._ID,
+                                            CalendarContract.Calendars.ACCOUNT_NAME};
+                                    ContentResolver cr = context.getContentResolver();
+                                    Cursor cursor = cr.query(Uri.parse("content://com.android.calendar/calendars"), projection,
+                                            CalendarContract.Calendars.ACCOUNT_NAME + "=? and (" +
+                                                    CalendarContract.Calendars.NAME + "=? or " +
+                                                    CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + "=?)",
+                                            new String[]{calenderEmaillAddress, calenderEmaillAddress,
+                                                    calenderEmaillAddress}, null);
+
+                                    if (cursor.moveToFirst()) {
+
+                                        if (cursor.getString(1).equals(calenderEmaillAddress)) {
+
+                                            calenderId = cursor.getInt(0);
+                                        }
+                                    }
+
+
+                                    long start2 = Calendar.getInstance().getTimeInMillis(); // 2011-02-12 12h00
+                                    long end2 = Calendar.getInstance().getTimeInMillis() + (4 * 60 * 60 * 1000);   // 2011-02-12 13h00
+
+                                    String title = "This is my demo test with alaram with 5 minutes";
 
                                     ContentValues cvEvent = new ContentValues();
-                                    cvEvent.put("calendar_id", 1);
-                                    cvEvent.put("title", title);
-                                    cvEvent.put("dtstart", start2 );
-                                    //cvEvent.put("hasAlarm", 1);
+                                    cvEvent.put("calendar_id", calenderId);
+                                    cvEvent.put(CalendarContract.Events.TITLE, title);
+
+                                    cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(start2));
+                                    cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
+                                    cvEvent.put("dtstart", start2);
+                                    cvEvent.put("hasAlarm", 1);
                                     cvEvent.put("dtend", end2);
-                                    cvEvent.put("","");
+                                    //cvEvent.put("","");
+                                    cvEvent.put("eventTimezone", TimeZone.getDefault().getID());
 
 
-                                    getContentResolver().insert(Uri.parse("content://com.android.calendar/events"), cvEvent);
+                                    Uri uri = getContentResolver().insert(Uri.parse("content://com.android.calendar/events"), cvEvent);
+
+
+// get the event ID that is the last element in the Uri
+                                    long eventID = Long.parseLong(uri.getLastPathSegment());
+
+
+                                    ContentValues values = new ContentValues();
+
+                                    values.put(CalendarContract.Reminders.MINUTES, 2);
+                                    values.put(CalendarContract.Reminders.EVENT_ID, eventID);
+                                    values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALARM);
+                                    cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+                                    //Uri uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+
+
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -285,44 +291,20 @@ public class DashBoardActivity extends AppCompatActivity
                             }
 
                             @Override
-                            public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+                            public void onPermissionDenied(PermissionDeniedResponse response) {*/
+/* ... *//*
+}
 
                             @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {*/
+/* ... *//*
+}
                         }).check();
-
-
+*/
 
 
                 /////////////////////////Open intent od calendat event /////////////////////
 
-              /*  Intent intent = new Intent(Intent.ACTION_INSERT);
-                intent.setType("vnd.android.cursor.item/event");
-                intent.putExtra(CalendarContract.Events.TITLE, "Learn Android");
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, "Home suit home");
-                intent.putExtra(CalendarContract.Events.DESCRIPTION, "Download Examples");
-
-// Setting dates
-                GregorianCalendar calDate = new GregorianCalendar(2017, 07, 05);
-                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                        calDate.getTimeInMillis()+(1*60*60));
-                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
-                        calDate.getTimeInMillis()+(1*60*60));
-
-// make it a full day event
-                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
-
-// make it a recurring Event
-               // intent.putExtra(CalendarContract.Events.RRULE, "FREQ=WEEKLY;COUNT=11;WKST=SU;BYDAY=TU,TH");
-
-// Making it private and shown as busy
-                intent.putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PUBLIC);
-                intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_FREE);
-
-
-
-                intent.setData(CalendarContract.Events.CONTENT_URI);
-                startActivity(intent);*/
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -461,7 +443,7 @@ public class DashBoardActivity extends AppCompatActivity
 
 
                 params.put("type", "fcmtoken");
-                params.put("userid", userDetails.get(SessionManager.KEY_EMP_ID));
+                params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
                 params.put("fcmtoken", fcm_tokenid);
 
                 Log.d(TAG, "Update FCM Params :" + params.toString());
@@ -571,7 +553,6 @@ public class DashBoardActivity extends AppCompatActivity
                 }
 
 
-
                 //alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis()+AlarmManager.INTERVAL_DAY,pendingIntent);
                 //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY, pendingIntent);  //set repeating every 24 hours
 
@@ -588,120 +569,286 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
-
-    private void sendOrderDetailsToServer() {
+    private void sendGPSLocationDetaislToServer() {
         try {
 
 
-            showDialog();
 
-            final String url = AllKeys.WEBSITE + "InsertService";
-            Log.d(TAG, "URL InsertOrderService : " + url);
+
+            String sq = "select * from " + dbhandler.TABLE_LOCATION_MASTER+ " where " + dbhandler.SYNC_STATUS + "=0";
+            //   sq = "select * from " + dbhandler.TABLE_ORDER_MASTER;
+            Log.d(TAG, "Query TABLE_LOCATION_MASTER : " + sq);
+
+
+
+
+
+            final Cursor cur = sd.rawQuery(sq, null);
+
+
+            if (cur.getCount() == 0) {
+                Log.d(TAG, "No Records Found in " + dbhandler.TABLE_LOCATION_MASTER + " cancelled API Call");
+                Toast.makeText(context, "No records found in "+dbhandler.TABLE_LOCATION_MASTER, Toast.LENGTH_SHORT).show();
+            } else {
+                showDialog();
+                Log.d(TAG, cur.getCount() + " Records Found in " + dbhandler.TABLE_LOCATION_MASTER + " call API");
+
+                showDialog();
+
+                final String url = AllKeys.WEBSITE + "InsertGPSLocationData";
+                Log.d(TAG, "URL TABLE_LOCATION_MASTER : " + url);
 
 
             /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
                     str_goalDetails, new Response.Listener<String>() {*/
-            CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
 
-                @Override
-                public void onResponse(JSONObject response) {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                    Log.d(TAG, "InsertOrderService Response : " + response.toString());
-
-
-                    try {
-                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
-                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
-                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
-                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+                        Log.d(TAG, "InsertGPSLocationData Response : " + response.toString());
 
 
-                        if (error_status == false) {
-                            Toast.makeText(context, "InsertOrderService details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                            String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                            boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                            boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
+                            if (error_status == false) {
+                                //Toast.makeText(context, "InsertOrderService details has been sync successfully", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG , "InsertGPSLocationData details has been sync successfully");
+                                sd.execSQL("update "+ dbhandler.TABLE_LOCATION_MASTER +" set "+ dbhandler.SYNC_STATUS +"=1");
+                            } else {
 
-                }
-
-
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    Log.d(TAG, "InsertClientFollowup  Error : " + error.getMessage());
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-
-
-                    String sq = "select * from " + dbhandler.TABLE_ORDER_MASTER;
-
-
-                    Cursor cur = sd.rawQuery(sq, null);
-
-
-                    params.put("type", "insertservice");
-                    params.put("RecordType", "multiple");
-
-                    params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
-
-                    String json = "";
-                    if (cur.getCount() > 0) {
-                        while (cur.moveToNext()) {
-
-
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-
-                                jsonObject.accumulate("orderid", cur.getString(cur.getColumnIndex(dbhandler.ORDER_ID)));
-                                jsonObject.accumulate("serviceid", cur.getString(cur.getColumnIndex(dbhandler.SERVICE_ID)));
-                                jsonObject.accumulate("qty", cur.getString(cur.getColumnIndex(dbhandler.ORDER_QUANTITY)));
-                                jsonObject.accumulate("rate", cur.getString(cur.getColumnIndex(dbhandler.ORDER_RATE)));
-                                jsonObject.accumulate("discountamt", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DISCOUNT_AMOUNT)));
-                                jsonObject.accumulate("netamt", cur.getString(cur.getColumnIndex(dbhandler.ORDER_NET_AMOUNT)));
-                                jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
-                                jsonObject.accumulate("devicetype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE)));
-                                jsonObject.accumulate("orderdate", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DATE)));
-
-
-                                json = json + jsonObject.toString() + ",";
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        json = json.substring(0, json.length() - 1);
-                        json = "[" + json + "]";
-                        Log.d(TAG, "InsertOrderService Data : " + json);
-                        Log.d("Json Data : ", url + "?type=InsertOrderService&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
-                        params.put("Data", json);
 
+
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
 
                     }
 
 
-                    return params;
-                }
+                }, new Response.ErrorListener() {
 
-            };
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-            // Adding request to request queue
-            MyApplication.getInstance().addToRequestQueue(request);
+                        Log.d(TAG, "InsertGPSLocationData  Error : " + error.getMessage());
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
+                    }
+                }) {
+
+                    @Override
+                    protected Map<String, String> getParams() {
+
+                        Map<String, String> params = new HashMap<String, String>();
+
+
+
+
+
+                        params.put("type", "insertgps");
+                        //params.put("RecordType", "multiple");
+
+                        params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
+
+                        String json = "";
+                        if (cur.getCount() > 0) {
+                            while (cur.moveToNext()) {
+
+
+                                try {
+                                    JSONObject jsonObject = new JSONObject();
+
+                                    jsonObject.accumulate("datetime", cur.getString(cur.getColumnIndex(dbhandler.LOCATION_TIME)));
+                                    jsonObject.accumulate("lattitude", cur.getString(cur.getColumnIndex(dbhandler.LOCATION_LATTITUDE)));
+                                    jsonObject.accumulate("longtitude", cur.getString(cur.getColumnIndex(dbhandler.LOCATION_LONGTITUDE)));
+
+                                    json = json + jsonObject.toString() + ",";
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            json = json.substring(0, json.length() - 1);
+                            json = "[" + json + "]";
+                            Log.d(TAG, "InsertGPSLocationData Data : " + json);
+                            Log.d("Json Data : ", url + "?type=insertgps&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
+                            params.put("Data", json);
+
+
+                        }
+
+
+                        return params;
+                    }
+
+                };
+
+                // Adding request to request queue
+                MyApplication.getInstance().addToRequestQueue(request);
+
+            }
+
+
+
+
+
+        } catch (Exception e) {
+            Log.d("InputStream", e.getLocalizedMessage());
+        }
+    }
+
+
+    private void sendOrderDetailsToServer()
+    {
+        try {
+
+
+
+
+            String sq = "select * from " + dbhandler.TABLE_ORDER_MASTER+ " where " + dbhandler.SYNC_STATUS + "=0";
+          //   sq = "select * from " + dbhandler.TABLE_ORDER_MASTER;
+            Log.d(TAG, "Query TABLE_ORDER_MASTER : " + sq);
+
+
+
+
+
+            final Cursor cur = sd.rawQuery(sq, null);
+
+
+            if (cur.getCount() == 0) {
+                Log.d(TAG, "No Records Found in " + dbhandler.TABLE_ORDER_MASTER + " cancelled API Call");
+                Toast.makeText(context, "No records found in "+dbhandler.TABLE_ORDER_MASTER, Toast.LENGTH_SHORT).show();
+            } else {
+                showDialog();
+                Log.d(TAG, cur.getCount() + " Records Found in " + dbhandler.TABLE_ORDER_MASTER + " call API");
+
+                showDialog();
+
+                final String url = AllKeys.WEBSITE + "InsertService";
+                Log.d(TAG, "URL InsertOrderService : " + url);
+
+
+            /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
+                    str_goalDetails, new Response.Listener<String>() {*/
+                CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        Log.d(TAG, "InsertOrderService Response : " + response.toString());
+
+
+                        try {
+                            String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                            String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                            boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                            boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+
+
+                            if (error_status == false) {
+                                //Toast.makeText(context, "InsertOrderService details has been sync successfully", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG , "InsertOrderService details has been sync successfully");
+                                sd.execSQL("update "+ dbhandler.TABLE_ORDER_MASTER +" set "+ dbhandler.SYNC_STATUS +"=1");
+                            } else {
+
+                                Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
+
+                    }
+
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        Log.d(TAG, "InsertClientFollowup  Error : " + error.getMessage());
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
+                    }
+                }) {
+
+                    @Override
+                    protected Map<String, String> getParams() {
+
+                        Map<String, String> params = new HashMap<String, String>();
+
+
+
+
+
+                        params.put("type", "insertservice");
+                        params.put("RecordType", "multiple");
+
+                        params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
+
+                        String json = "";
+                        if (cur.getCount() > 0) {
+                            while (cur.moveToNext()) {
+
+
+                                try {
+                                    JSONObject jsonObject = new JSONObject();
+
+                                    jsonObject.accumulate("orderid", cur.getString(cur.getColumnIndex(dbhandler.ORDER_ID)));
+                                    jsonObject.accumulate("serviceid", cur.getString(cur.getColumnIndex(dbhandler.SERVICE_ID)));
+                                    jsonObject.accumulate("qty", cur.getString(cur.getColumnIndex(dbhandler.ORDER_QUANTITY)));
+                                    jsonObject.accumulate("rate", cur.getString(cur.getColumnIndex(dbhandler.ORDER_RATE)));
+                                    jsonObject.accumulate("discountamt", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DISCOUNT_AMOUNT)));
+                                    jsonObject.accumulate("netamt", cur.getString(cur.getColumnIndex(dbhandler.ORDER_NET_AMOUNT)));
+                                    jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
+                                    jsonObject.accumulate("devicetype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE)));
+                                    jsonObject.accumulate("orderdate", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DATE)));
+                                    jsonObject.accumulate("orderdescr", cur.getString(cur.getColumnIndex(dbhandler.ORDER_DESCR)));
+
+                                    json = json + jsonObject.toString() + ",";
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            json = json.substring(0, json.length() - 1);
+                            json = "[" + json + "]";
+                            Log.d(TAG, "InsertOrderService Data : " + json);
+                            Log.d("Json Data : ", url + "?type=InsertOrderService&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
+                            params.put("Data", json);
+
+
+                        }
+
+
+                        return params;
+                    }
+
+                };
+
+                // Adding request to request queue
+                MyApplication.getInstance().addToRequestQueue(request);
+
+            }
+
+
+
 
 
         } catch (Exception e) {
@@ -713,114 +860,130 @@ public class DashBoardActivity extends AppCompatActivity
 
 
     private void sendFollowupDetailsToServer() {
+
+
         try {
 
 
-            showDialog();
+            String sq = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + " where " + dbhandler.SYNC_STATUS + "=0";
 
-            final String url = AllKeys.WEBSITE + "InsertClientFollowup";
+            Log.d(TAG, "Query Followupmaster : " + sq);
+            final Cursor cur = sd.rawQuery(sq, null);
+
+
+            if (cur.getCount() == 0) {
+                Log.d(TAG, "No Records Found in " + dbhandler.TABLE_FOLLOWUP_MASTER + " cancelled API Call");
+                Toast.makeText(context, "No records found in "+dbhandler.TABLE_FOLLOWUP_MASTER, Toast.LENGTH_SHORT).show();
+            } else {
+                showDialog();
+                Log.d(TAG, cur.getCount() + " Records Found in " + dbhandler.TABLE_FOLLOWUP_MASTER + " call API");
+
+
+                final String url = AllKeys.WEBSITE + "InsertClientFollowup";
 
 
             /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
                     str_goalDetails, new Response.Listener<String>() {*/
-            CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
 
-                @Override
-                public void onResponse(JSONObject response) {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                    Log.d(TAG, "InsertClientFollowup Res : " + response.toString());
-
-
-                    try {
-                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
-                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
-                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
-                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+                        Log.d(TAG, "InsertClientFollowup Res : " + response.toString());
 
 
-                        if (error_status == false) {
-                            Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                            String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                            boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                            boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
+                            if (error_status == false) {
 
-                }
+                                Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
+                                sd.execSQL("update "+ dbhandler.TABLE_FOLLOWUP_MASTER +" set "+ dbhandler.SYNC_STATUS +"=1");
 
-
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    Log.d(TAG, "InsertClientFollowup  Error : " + error.getMessage());
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-
-
-                    String sq = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER;
-
-
-                    Cursor cur = sd.rawQuery(sq, null);
-
-
-                    params.put("type", "insertfollowup");
-                    params.put("RecordType", "multiple");
-
-                    params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
-
-                    String json = "";
-                    if (cur.getCount() > 0) {
-                        while (cur.moveToNext()) {
-
-
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-
-                                jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
-                                jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
-                                jsonObject.accumulate("description", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DESCR))));
-                                jsonObject.accumulate("datetime", dbhandler.convertToJsonDateFormat(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DATE))) + " " + cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_TIME)));
-                                jsonObject.accumulate("status", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_STATUS)));
-                                jsonObject.accumulate("reason", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_REASON)));
-
-
-                                json = json + jsonObject.toString() + ",";
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            } else {
+                                Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        json = json.substring(0, json.length() - 1);
-                        json = "[" + json + "]";
-                        Log.d(TAG, "InsertClientFollowup Data : " + json);
-                        Log.d("Json Data : ", url + "?type=insertfollowup&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
-                        params.put("Data", json);
 
+
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
 
                     }
 
 
-                    return params;
-                }
+                }, new Response.ErrorListener() {
 
-            };
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-            // Adding request to request queue
-            MyApplication.getInstance().addToRequestQueue(request);
+                        Log.d(TAG, "InsertClientFollowup  Error : " + error.getMessage());
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
+                    }
+                }) {
+
+                    @Override
+                    protected Map<String, String> getParams() {
+
+                        Map<String, String> params = new HashMap<String, String>();
+
+
+                        params.put("type", "insertfollowup");
+                        params.put("RecordType", "multiple");
+
+                        params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
+
+                        String json = "";
+                        if (cur.getCount() > 0) {
+                            while (cur.moveToNext()) {
+
+
+                                try {
+                                    JSONObject jsonObject = new JSONObject();
+
+                                    jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
+                                    jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
+                                    jsonObject.accumulate("description", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DESCR))));
+                                    jsonObject.accumulate("datetime", dbhandler.convertToJsonDateFormat(cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_DATE))) + " " + cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_TIME)));
+                                    jsonObject.accumulate("status", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_STATUS)));
+                                    jsonObject.accumulate("reason", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_REASON)));
+                                    jsonObject.accumulate("followupid", cur.getString(cur.getColumnIndex(dbhandler.FOLLOWUP_ID)));
+
+
+                                    json = json + jsonObject.toString() + ",";
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            json = json.substring(0, json.length() - 1);
+                            json = "[" + json + "]";
+                            Log.d(TAG, "InsertClientFollowup Data : " + json);
+                            Log.d("Json Data : ", url + "?type=insertfollowup&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&Data=" + json);
+                            params.put("Data", json);
+
+
+                        }
+
+
+                        return params;
+                    }
+
+                };
+
+                // Adding request to request queue
+                MyApplication.getInstance().addToRequestQueue(request);
+
+
+            }
 
 
         } catch (Exception e) {
@@ -835,127 +998,137 @@ public class DashBoardActivity extends AppCompatActivity
         try {
 
 
-            showDialog();
+            //Check Records exist with syncstatus 0 , if records exist then call API.
 
-            final String url = AllKeys.WEBSITE + "InsertClient";
+
+            String sq = "select * from " + dbhandler.TABLE_CLIENTMASTER + " where " + dbhandler.SYNC_STATUS + "=0";
+            final Cursor cur = sd.rawQuery(sq, null);
+
+
+            if (cur.getCount() == 0) {
+                Log.d(TAG, "No Records Found in " + dbhandler.TABLE_CLIENTMASTER + " cancelled API Call");
+                Toast.makeText(context, "No records found in "+dbhandler.TABLE_CLIENTMASTER, Toast.LENGTH_SHORT).show();
+            } else {
+                showDialog();
+                Log.d(TAG, cur.getCount() + " Records Found in " + dbhandler.TABLE_CLIENTMASTER + " call API");
+                final String url = AllKeys.WEBSITE + "InsertClient";
 
 
             /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
                     str_goalDetails, new Response.Listener<String>() {*/
-            CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+                CustomRequest request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
 
-                @Override
-                public void onResponse(JSONObject response) {
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                    Log.d(TAG, "InsertClient Res : " + response.toString());
-
-
-                    try {
-                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
-                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
-                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
-                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
+                        Log.d(TAG, "InsertClient Res : " + response.toString());
 
 
-                        if (error_status == false) {
-                            Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                            String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                            boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                            boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
 
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
-
-                }
-
-
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    Log.d(TAG, "InsertClient  Error : " + error.getMessage());
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-
-
-                    String sq = "select * from " + dbhandler.TABLE_CLIENTMASTER;
-
-
-                    Cursor cur = sd.rawQuery(sq, null);
-
-
-                    params.put("type", "insertclient");
-                    params.put("RecordType", "multiple");
-
-                    params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
-
-                    String json = "";
-                    if (cur.getCount() > 0) {
-                        while (cur.moveToNext()) {
-
-
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
-                                jsonObject.accumulate("companyname", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_COMPANYNAME))));
-                                jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
-                                jsonObject.accumulate("mobile1", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE1))));
-                                jsonObject.accumulate("mobile2", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE2))));
-                                jsonObject.accumulate("landline", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LANDLINE))));
-                                jsonObject.accumulate("email", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_EMAIL))));
-                                jsonObject.accumulate("business", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_BUSSINESS))));
-                                jsonObject.accumulate("address", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ADDRESS))));
-                                jsonObject.accumulate("contactperson", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NAME))));
-                                String v_front = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_FRONT));
-                                v_front = v_front.replace("http://crm.tech9teen.com/", "");
-                                jsonObject.accumulate("visitingfront", v_front);
-
-                                String v_back = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_BACK));
-                                v_back = v_back.replace("http://crm.tech9teen.com/", "");
-                                jsonObject.accumulate("visitingback", v_back);
-                                jsonObject.accumulate("createddate", cur.getString(cur.getColumnIndex(dbhandler.VISIT_DATE)));
-                                jsonObject.accumulate("latitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LATTITUDE)));
-                                jsonObject.accumulate("longitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)));
-                                jsonObject.accumulate("clienttype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_TYPE)));
-                                jsonObject.accumulate("website", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
-                                jsonObject.accumulate("note", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NOTE))));
-
-
-                                json = json + jsonObject.toString() + ",";
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            if (error_status == false) {
+                                Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
+                                sd.execSQL("update "+ dbhandler.TABLE_CLIENTMASTER +" set "+ dbhandler.SYNC_STATUS +"=1");
+                            } else {
+                                Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        json = json.substring(0, json.length() - 1);
-                        json = "[" + json + "]";
-                        Log.d("InsertClient Data : ", json);
-                        Log.d("Json Data : ", url + "?type=InsertClient&custid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&data=" + json);
-                        params.put("Data", json);
 
+
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
 
                     }
 
 
-                    return params;
-                }
+                }, new Response.ErrorListener() {
 
-            };
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
 
-            // Adding request to request queue
-            MyApplication.getInstance().addToRequestQueue(request);
+                        Log.d(TAG, "InsertClient  Error : " + error.getMessage());
+                        if (pDialog.isShowing()) {
+                            hideDialog();
+                        }
+                    }
+                }) {
+
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<String, String>();
+
+
+                        params.put("type", "insertclient");
+                        params.put("RecordType", "multiple");
+
+                        params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
+
+                        String json = "";
+                        if (cur.getCount() > 0) {
+                            while (cur.moveToNext()) {
+
+
+                                try {
+                                    JSONObject jsonObject = new JSONObject();
+                                    jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
+                                    jsonObject.accumulate("companyname", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_COMPANYNAME))));
+                                    jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
+                                    jsonObject.accumulate("mobile1", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE1))));
+                                    jsonObject.accumulate("mobile2", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE2))));
+                                    jsonObject.accumulate("landline", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LANDLINE))));
+                                    jsonObject.accumulate("email", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_EMAIL))));
+                                    jsonObject.accumulate("business", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_BUSSINESS))));
+                                    jsonObject.accumulate("address", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ADDRESS))));
+                                    jsonObject.accumulate("contactperson", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NAME))));
+                                    String v_front = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_FRONT));
+                                    v_front = v_front.replace("http://crm.tech9teen.com/", "");
+                                    jsonObject.accumulate("visitingfront", v_front);
+
+                                    String v_back = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_BACK));
+                                    v_back = v_back.replace("http://crm.tech9teen.com/", "");
+                                    jsonObject.accumulate("visitingback", v_back);
+                                    jsonObject.accumulate("createddate", cur.getString(cur.getColumnIndex(dbhandler.VISIT_DATE)));
+                                    jsonObject.accumulate("latitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LATTITUDE)));
+                                    jsonObject.accumulate("longitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)));
+                                    jsonObject.accumulate("clienttype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_TYPE)));
+                                    jsonObject.accumulate("website", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_WEBSITE)));
+                                    jsonObject.accumulate("note", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NOTE))));
+
+
+                                    json = json + jsonObject.toString() + ",";
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            json = json.substring(0, json.length() - 1);
+                            json = "[" + json + "]";
+                            Log.d("InsertClient Data : ", json);
+                            Log.d("Json Data : ", url + "?type=InsertClient&custid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&data=" + json);
+                            params.put("Data", json);
+
+
+                        }
+
+
+                        return params;
+                    }
+
+                };
+
+                // Adding request to request queue
+                MyApplication.getInstance().addToRequestQueue(request);
+
+
+            }
+            //complete if condition
 
 
         } catch (Exception e) {
@@ -1005,7 +1178,8 @@ public class DashBoardActivity extends AppCompatActivity
 
 
             fragmentTransaction.replace(R.id.container_body, fragment);
-            fragmentTransaction.commit();
+            // fragmentTransaction.commit();
+            fragmentTransaction.commitAllowingStateLoss();
 
 
         } else {
@@ -1016,7 +1190,8 @@ public class DashBoardActivity extends AppCompatActivity
 
             fragment = new FragmentHome();
             fragmentTransaction.replace(R.id.container_body, fragment);
-            fragmentTransaction.commit();
+            //fragmentTransaction.commit();
+            fragmentTransaction.commitAllowingStateLoss();
         }
 
 
@@ -1273,8 +1448,9 @@ public class DashBoardActivity extends AppCompatActivity
 
             sendAllClientDetailsToServer();
             sendFollowupDetailsToServer();
-
             sendOrderDetailsToServer();
+            sendGPSLocationDetaislToServer();
+
 
      /*       // define the animation for rotation
             Animation animation = new RotateAnimation(0.0f, 360.0f,
@@ -1297,6 +1473,8 @@ public class DashBoardActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -1311,8 +1489,8 @@ public class DashBoardActivity extends AppCompatActivity
             setupFragment(new FragmentFollowup(), "Follow up");
 
         } else if (id == R.id.nav_import) {
-            getAllClientDetailsFromServer();
 
+            getAllClientDetailsFromServer();
             getAllClientFollowupDetailsFromServer();
             getAllOrderOrServiceDetailsFromServer();
 
@@ -1324,11 +1502,11 @@ public class DashBoardActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
 
 
-            Intent intent = new Intent(context, CalendarDemoActivity.class);
+           /* Intent intent = new Intent(context, CalendarDemoActivity.class);
             startActivity(intent);
-            finish();
-          /*  context.deleteDatabase(dbhandler.databasename);
-            sessionmanager.logoutUser();*/
+            finish();*/
+            context.deleteDatabase(dbhandler.databasename);
+            sessionmanager.logoutUser();
 
         }
 
@@ -1341,14 +1519,14 @@ public class DashBoardActivity extends AppCompatActivity
     private void getAllOrderOrServiceDetailsFromServer() {
 
 
-        String url = AllKeys.WEBSITE + "ViewServiceMaster?type=service&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "";
-        Log.d(TAG, "URL ViewServiceMaster " + url);
+        String url = AllKeys.WEBSITE + "ViewServiceHistory?type=servicehistory&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "";
+        Log.d(TAG, "URL ViewServiceHistory " + url);
 
         JsonObjectRequest reuqest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
-                Log.d(TAG, "Response ViewServiceMaster  : " + response);
+                Log.d(TAG, "Response ViewServiceHistory  : " + response);
 
                 try {
                     String str_error = response.getString(AllKeys.TAG_MESSAGE);
@@ -1371,17 +1549,19 @@ public class DashBoardActivity extends AppCompatActivity
 
 
                                 ContentValues cv = new ContentValues();
-                                cv.put(dbhandler.ORDER_ID, AllKeys.TAG_ORDERID);
-                                cv.put(dbhandler.ORDER_SERVICEID, AllKeys.TAG_SERVICEID);
-                                cv.put(dbhandler.ORDER_QUANTITY, AllKeys.TAG_QUIANTITY);
-                                cv.put(dbhandler.ORDER_RATE, AllKeys.TAG_RATE);
-                                cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, AllKeys.TAG_DISCOUNT_AMT);
-                                cv.put(dbhandler.ORDER_NET_AMOUNT, AllKeys.TAG_NET_AMT);
-                                cv.put(dbhandler.ORDER_CLIENT_ID, AllKeys.TAG_CLIENT_ID);
-                                cv.put(dbhandler.ORDER_EMPLOYEE_ID, AllKeys.TAG_EMPID);
-                                cv.put(dbhandler.ORDER_DATE, AllKeys.TAG_DATE);
-                                cv.put(dbhandler.CLIENT_DEVICE_TYPE, AllKeys.TAG_DEVICETYPE);
+                                cv.put(dbhandler.ORDER_ID, c.getString(AllKeys.TAG_ORDERID));
+                                cv.put(dbhandler.ORDER_SERVICEID, c.getString(AllKeys.TAG_SERVICEID));
+                                cv.put(dbhandler.ORDER_QUANTITY, c.getString(AllKeys.TAG_QUIANTITY));
+                                cv.put(dbhandler.ORDER_RATE, c.getString(AllKeys.TAG_RATE));
+                                cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, c.getString(AllKeys.TAG_DISCOUNT_AMT));
+                                cv.put(dbhandler.ORDER_NET_AMOUNT, c.getString(AllKeys.TAG_NET_AMT));
+                                cv.put(dbhandler.ORDER_CLIENT_ID, c.getString(AllKeys.TAG_CLIENT_ID));
+                                cv.put(dbhandler.ORDER_EMPLOYEE_ID, c.getString(AllKeys.TAG_EMPID));
+                                cv.put(dbhandler.ORDER_DATE,c.getString(AllKeys.TAG_DATE));
+                                cv.put(dbhandler.CLIENT_DEVICE_TYPE, c.getString(AllKeys.TAG_DEVICETYPE));
 
+                                cv.put(dbhandler.ORDER_DESCR, c.getString(AllKeys.TAG_ORDER_DESCR));
+                                cv.put(dbhandler.SYNC_STATUS, "1");
                                 Log.d(TAG, "OrderMaster Insert Data : " + cv.toString());
 
                                 sd.insert(dbhandler.TABLE_ORDER_MASTER, null, cv);
@@ -1406,7 +1586,7 @@ public class DashBoardActivity extends AppCompatActivity
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                Log.d(TAG, "ViewServiceMaster Error " + error.getMessage());
+                Log.d(TAG, "ViewServiceHistory Error " + error.getMessage());
                 if (error instanceof ServerError || error instanceof NetworkError) {
 
                     hideDialog();
@@ -1458,6 +1638,7 @@ public class DashBoardActivity extends AppCompatActivity
 
                                 ContentValues cv = new ContentValues();
                                 cv.put(dbhandler.CLIENT_ID, c.getString(AllKeys.TAG_CLIENTID));
+                                cv.put(dbhandler.FOLLOWUP_ID, c.getString(AllKeys.TAG_FOLLOWUPID));
                                 cv.put(dbhandler.FOLLOWUP_DATE, c.getString(AllKeys.TAG_DATE));
                                 cv.put(dbhandler.FOLLOWUP_TIME, c.getString(AllKeys.TAG_TIME));
                                 cv.put(dbhandler.FOLLOWUP_DESCR, c.getString(AllKeys.TAG_DESCRIPTION));
@@ -1472,6 +1653,7 @@ public class DashBoardActivity extends AppCompatActivity
                                     e.printStackTrace();
                                     cv.put(dbhandler.FOLLOWUP_REASON, "");
                                 }
+                                cv.put(dbhandler.SYNC_STATUS, "1");
 
                                 sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv);
 
@@ -1558,7 +1740,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.CLIENT_ADDRESS, c.getString(AllKeys.TAG_ADDRESS));
                                 cv.put(dbhandler.VISIT_DATE, dbhandler.convertToJsonDateFormat(c.getString(AllKeys.TAG_CREATED_DATE)));
                                 cv.put(dbhandler.CLIENT_NOTE, c.getString(AllKeys.TAG_NOTE));
-                                cv.put(dbhandler.CLIENT_SYNC_STATUS, "1");
+
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, c.getString(AllKeys.TAG_DEVICETYPE));
                                 cv.put(dbhandler.CLIENT_LATTITUDE, c.getString(AllKeys.TAG_LATTITUDE));
                                 cv.put(dbhandler.CLIENT_LONGTITUDE, c.getString(AllKeys.TAG_LONGTIUDE));
@@ -1568,6 +1750,7 @@ public class DashBoardActivity extends AppCompatActivity
                                 cv.put(dbhandler.CLIENT_VISITING_CARD_BACK, c.getString(AllKeys.TAG_VISITING_CARD_BACK));
                                 cv.put(dbhandler.EMPLOYEE_ID, AllKeys.TAG_EMPID);
 
+                                cv.put(dbhandler.SYNC_STATUS, "1");
                                 sd.insert(dbhandler.TABLE_CLIENTMASTER, null, cv);
 
 

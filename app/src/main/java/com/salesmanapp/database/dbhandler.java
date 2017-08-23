@@ -50,7 +50,7 @@ public class dbhandler extends SQLiteOpenHelper {
 
 
     public static final String databasename = "SalesManApp.db";
-    public static final int dbversion = 21;
+    public static final int dbversion = 29;
     private final Context context;
 
     String query = "";
@@ -72,7 +72,7 @@ public class dbhandler extends SQLiteOpenHelper {
     public static final String VISIT_DATE = "VisitDate";
     public static final String CLIENT_ADDRESS = "Address";
     public static final String CLIENT_NOTE = "Note";
-    public static final String CLIENT_SYNC_STATUS = "SyncStatus";
+    //public static final String CLIENT_SYNC_STATUS = "SyncStatus";
     public static final String CLIENT_DEVICE_TYPE = "DeviceType";
     public static final String CLIENT_TYPE = "ClientType";
     public static final String CLIENT_VISITING_CARD_FRONT = "ClientVisitingCardFront";
@@ -86,7 +86,7 @@ public class dbhandler extends SQLiteOpenHelper {
     public static final String LOCATION_TIME = "LocationTime";
     public static final String LOCATION_LATTITUDE = "Lattitude";
     public static final String LOCATION_LONGTITUDE = "Longtitude";
-    public static final String LOCATION_SYNC_STATUS = "syncStatus";
+   // public static final String SYNC_STATUS = "syncStatus";SyncStatus
 
 
     public static final String TABLE_FOLLOWUP_MASTER = "FollowupMaster";
@@ -122,6 +122,9 @@ public class dbhandler extends SQLiteOpenHelper {
     public static final String ORDER_CLIENT_ID = "ClientId";
     public static final String ORDER_EMPLOYEE_ID = "EmployeeId";
     public static final String ORDER_DATE = "Date";
+    public static final String ORDER_DESCR = "Descr";
+
+    public static final String SYNC_STATUS = "SyncStatus";
 
 
     private static String TAG = dbhandler.class.getSimpleName();
@@ -140,12 +143,13 @@ public class dbhandler extends SQLiteOpenHelper {
         try {
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ," + CLIENT_DEVICE_TYPE + " TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT," + CLIENT_MOBILE2 + " TEXT," + CLIENT_LANDLINE + " TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT," + CLIENT_SYNC_STATUS + " TEXT," + CLIENT_COMPANYNAME + " TEXT," + CLIENT_LATTITUDE + " TEXT," + CLIENT_LONGTITUDE + " TEXT," + CLIENT_TYPE + " TEXT," + CLIENT_VISITING_CARD_FRONT + " TEXT," + CLIENT_VISITING_CARD_BACK + " TEXT," + CLIENT_WEBSITE + " TEXT," + EMPLOYEE_ID + " TEXT)";
+     //       query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ," + CLIENT_DEVICE_TYPE + " TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT," + CLIENT_MOBILE2 + " TEXT," + CLIENT_LANDLINE + " TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT," + CLIENT_SYNC_STATUS + " TEXT," + CLIENT_COMPANYNAME + " TEXT," + CLIENT_LATTITUDE + " TEXT," + CLIENT_LONGTITUDE + " TEXT," + CLIENT_TYPE + " TEXT," + CLIENT_VISITING_CARD_FRONT + " TEXT," + CLIENT_VISITING_CARD_BACK + " TEXT," + CLIENT_WEBSITE + " TEXT," + EMPLOYEE_ID + " TEXT,"+ SYNC_STATUS +" TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTMASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY ," + CLIENT_ID + " INTEGER ," + CLIENT_DEVICE_TYPE + " TEXT," + CLIENT_NAME + " TEXT," + CLIENT_EMAIL + " TEXT," + CLIENT_MOBILE1 + " TEXT," + CLIENT_MOBILE2 + " TEXT," + CLIENT_LANDLINE + " TEXT," + CLIENT_BUSSINESS + " TEXT," + VISIT_DATE + " TEXT," + CLIENT_ADDRESS + " TEXT, " + CLIENT_NOTE + " TEXT," + CLIENT_COMPANYNAME + " TEXT," + CLIENT_LATTITUDE + " TEXT," + CLIENT_LONGTITUDE + " TEXT," + CLIENT_TYPE + " TEXT," + CLIENT_VISITING_CARD_FRONT + " TEXT," + CLIENT_VISITING_CARD_BACK + " TEXT," + CLIENT_WEBSITE + " TEXT," + EMPLOYEE_ID + " TEXT,"+ SYNC_STATUS +" TEXT)";
             Log.d("Table  : " + TABLE_CLIENTMASTER, query);
             db.execSQL(query);
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION_MASTER + "(" + LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + LOCATION_TIME + " TEXT," + LOCATION_LATTITUDE + " TEXT," + LOCATION_LONGTITUDE + " TEXT," + LOCATION_SYNC_STATUS + " TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION_MASTER + "(" + LOCATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + LOCATION_TIME + " TEXT," + LOCATION_LATTITUDE + " TEXT," + LOCATION_LONGTITUDE + " TEXT," + SYNC_STATUS + " TEXT)";
             Log.d("Table  : " + TABLE_LOCATION_MASTER, query);
             db.execSQL(query);
 
@@ -154,12 +158,12 @@ public class dbhandler extends SQLiteOpenHelper {
             db.execSQL(query);
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_FOLLOWUP_MASTER + "(" + FOLLOWUP_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + FOLLOWUP_DESCR + " TEXT," + FOLLOWUP_DATE + " TEXT," + FOLLOWUP_TIME + " TEXT," + CLIENT_ID + " TEXT, " + EMPLOYEE_ID + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT," + FOLLOWUP_STATUS + " TEXT," + FOLLOWUP_REASON + " TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_FOLLOWUP_MASTER + "(" + FOLLOWUP_ID + " TEXT," + FOLLOWUP_DESCR + " TEXT," + FOLLOWUP_DATE + " TEXT," + FOLLOWUP_TIME + " TEXT," + CLIENT_ID + " TEXT, " + EMPLOYEE_ID + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT," + FOLLOWUP_STATUS + " TEXT," + FOLLOWUP_REASON + " TEXT,"+ SYNC_STATUS +" TEXT)";
             Log.d("Table  : " + TABLE_FOLLOWUP_MASTER, query);
             db.execSQL(query);
 
 
-            query = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_MASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + ORDER_ID + " TEXT," + ORDER_SERVICEID + " INTEGER," + ORDER_QUANTITY + " TEXT," + ORDER_RATE + " TEXT, " + ORDER_DISCOUNT_AMOUNT + " TEXT," + ORDER_NET_AMOUNT + " TEXT," + ORDER_CLIENT_ID + " TEXT," + ORDER_EMPLOYEE_ID + " TEXT," + ORDER_DATE + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT)";
+            query = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_MASTER + "(" + UNIQUE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + ORDER_ID + " TEXT," + ORDER_SERVICEID + " INTEGER," + ORDER_QUANTITY + " TEXT," + ORDER_RATE + " TEXT, " + ORDER_DISCOUNT_AMOUNT + " TEXT," + ORDER_NET_AMOUNT + " TEXT," + ORDER_CLIENT_ID + " TEXT," + ORDER_EMPLOYEE_ID + " TEXT," + ORDER_DATE + " TEXT," + CLIENT_DEVICE_TYPE + " TEXT,"+ ORDER_DESCR +" TEXT,"+ SYNC_STATUS +" TEXT)";
             Log.d("Table  : " + TABLE_ORDER_MASTER, query);
             db.execSQL(query);
 
@@ -184,6 +188,8 @@ public class dbhandler extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOLLOWUP_MASTER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_MASTER);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_SERVICES);
+
+
 
 
 

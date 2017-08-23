@@ -78,6 +78,20 @@
                         android:background="@null"
                         android:hint="Service Name" />
                 </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:paddingLeft="4dp"
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/edtServiceDescr"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:background="@null"
+                        android:hint="Service Description" />
+                </android.support.design.widget.TextInputLayout>
 
 
                 <LinearLayout

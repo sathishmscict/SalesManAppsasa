@@ -616,7 +616,7 @@
                                         android:background="@null"
                                         android:gravity="center|left|top"
                                         android:hint="Note"
-                                        android:inputType="textCapWords|textMultiLine"
+                                        android:inputType="textCapSentences|textMultiLine"
                                         android:maxLines="4"
                                         android:minLines="3"
                                         android:paddingLeft="4dp"

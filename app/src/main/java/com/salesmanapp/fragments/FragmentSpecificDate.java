@@ -149,7 +149,8 @@ public class FragmentSpecificDate extends Fragment {
         return rootView;
     }
 
-    public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+    public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener
+    {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {

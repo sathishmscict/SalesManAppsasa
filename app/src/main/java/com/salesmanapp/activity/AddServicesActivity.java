@@ -136,6 +136,9 @@ public class AddServicesActivity extends AppCompatActivity {
                 final EditText edtRate = (EditText) dialog.findViewById(R.id.edtRate);
                 final EditText edtDiscountAmount = (EditText) dialog.findViewById(R.id.edtDiscountAmount);
                 final EditText edtNetAmount = (EditText) dialog.findViewById(R.id.edtNetAmount);
+                final EditText edtDescr = (EditText) dialog.findViewById(R.id.edtDescr);
+
+
 
                 final TextView tvError = (TextView) dialog.findViewById(R.id.tvError);
                 tvError.setVisibility(View.GONE);
@@ -168,6 +171,10 @@ public class AddServicesActivity extends AppCompatActivity {
                                 if (!edtDiscountAmount.getText().toString().equals("")) {
                                     discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
 
+                                }
+                                else
+                                {
+                                    discountamount=0.0;
                                 }
 
                                 Double netamount = (rate * qunatity) - discountamount;
@@ -339,7 +346,7 @@ public class AddServicesActivity extends AppCompatActivity {
 
 
                             try {
-                                Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%ODRAND"+ userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
+                                Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%ODRAND" + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + "%'", null);
                                 //cur_max_orderid.moveToFirst();
                                 int max_orderid = cur_max_orderid.getCount();
                                 ++max_orderid;
@@ -347,16 +354,30 @@ public class AddServicesActivity extends AppCompatActivity {
 
 
                                 ContentValues cv = new ContentValues();
-                                cv.put(dbhandler.ORDER_ID, "ODRAND"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + max_orderid);
+                                cv.put(dbhandler.ORDER_ID, "ANDORDER" + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + max_orderid);
                                 cv.put(dbhandler.ORDER_SERVICEID, list_service_id.get(spnServices.getSelectedItemPosition()));
                                 cv.put(dbhandler.ORDER_QUANTITY, edtServiceQuntity.getText().toString());
                                 cv.put(dbhandler.ORDER_RATE, edtRate.getText().toString());
-                                cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, edtDiscountAmount.getText().toString());
+
+                                Double discountamount = 0.0;
+                                if (!edtDiscountAmount.getText().toString().equals("")) {
+                                    discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
+
+                                }
+                                else
+                                {
+                                    discountamount=0.0;
+                                }
+
+
+                                cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, discountamount.intValue());
                                 cv.put(dbhandler.ORDER_NET_AMOUNT, edtNetAmount.getText().toString());
                                 cv.put(dbhandler.ORDER_CLIENT_ID, userDetails.get(SessionManager.KEY_CLIENTID));
                                 cv.put(dbhandler.ORDER_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                                 cv.put(dbhandler.ORDER_DATE, dbhandler.getDateTime());
+                                cv.put(dbhandler.ORDER_DESCR, edtDescr.getText().toString());
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
+                                cv.put(dbhandler.SYNC_STATUS , "0");
 
                                 Log.d(TAG, "OrderMaster Insert Data : " + cv.toString());
 
@@ -364,6 +385,7 @@ public class AddServicesActivity extends AppCompatActivity {
 
                                 edtDiscountAmount.setText("");
                                 edtServiceQuntity.setText("");
+                                edtDescr.setText("");
                                 edtRate.setText("");
                                 edtNetAmount.setText("");
                                 spnServices.setSelection(0);
@@ -403,10 +425,11 @@ public class AddServicesActivity extends AppCompatActivity {
         LinearLayoutManager lManager = new LinearLayoutManager(context);
         rv_services.setLayoutManager(lManager);
 
-        FillDataOnRecyclerView();
+
 
 
         getServiceDetailsFromServer();
+        FillDataOnRecyclerView();
 
 
     }
@@ -414,7 +437,7 @@ public class AddServicesActivity extends AppCompatActivity {
     private void FillDataOnspinner(boolean status) {
 
 
-        String query = "select * from " + dbhandler.TABLE_SERVICES + "";
+        String query = "select * from " + dbhandler.TABLE_SERVICES + "  order by "+ dbhandler.SERVICE_NAME +"";
         Log.d(TAG, "Query  : ");
 
         Cursor cc = sd.rawQuery(query, null);
@@ -448,28 +471,33 @@ public class AddServicesActivity extends AppCompatActivity {
     }
 
     private void FillDataOnRecyclerView() {
-        String query = "Select * from " + dbhandler.TABLE_ORDER_MASTER + " where "+ dbhandler.CLIENT_ID +" ='"+ userDetails.get(SessionManager.KEY_CLIENTID) +"'";
-        Log.d(TAG, "Query   : " + query);
+        try {
+            String query = "Select * from " + dbhandler.TABLE_ORDER_MASTER + " where "+ dbhandler.CLIENT_ID +" ='"+ userDetails.get(SessionManager.KEY_CLIENTID) +"'";
+            Log.d(TAG, "Query   : " + query);
 
-        Cursor cc = sd.rawQuery(query, null);
-        listOrders.clear();
-        if (cc.getCount() > 0) {
-            while (cc.moveToNext()) {
-                //OrderData(String orderid, String serviceid, String quantity, String rate, String discountamount, String netamount, String cleintid, String employeeid, String date) {
+            Cursor cc = sd.rawQuery(query, null);
+            listOrders.clear();
+            if (cc.getCount() > 0) {
+                while (cc.moveToNext()) {
+                    //OrderData(String orderid, String serviceid, String quantity, String rate, String discountamount, String netamount, String cleintid, String employeeid, String date) {
 
-                OrderData od = new OrderData(cc.getString(cc.getColumnIndex(dbhandler.ORDER_ID)), list_service.get(list_service_id.indexOf(cc.getString(cc.getColumnIndex(dbhandler.ORDER_SERVICEID)))), cc.getString(cc.getColumnIndex(dbhandler.ORDER_QUANTITY)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_RATE)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_DISCOUNT_AMOUNT)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_NET_AMOUNT)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_CLIENT_ID)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_EMPLOYEE_ID)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_DATE)), cc.getString(cc.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE)));
-                listOrders.add(od);
+                    OrderData od = new OrderData(cc.getString(cc.getColumnIndex(dbhandler.ORDER_ID)), list_service.get(list_service_id.indexOf(cc.getString(cc.getColumnIndex(dbhandler.ORDER_SERVICEID)))), cc.getString(cc.getColumnIndex(dbhandler.ORDER_QUANTITY)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_RATE)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_DISCOUNT_AMOUNT)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_NET_AMOUNT)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_CLIENT_ID)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_EMPLOYEE_ID)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_DATE)), cc.getString(cc.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE)), cc.getString(cc.getColumnIndex(dbhandler.ORDER_DESCR)));
+                    listOrders.add(od);
+                }
+
+                adapter = new OrderSummaryAdapterRecyclerView(context, listOrders);
+                rv_services.setAdapter(adapter);
+
             }
-
-            adapter = new OrderSummaryAdapterRecyclerView(context, listOrders);
-            rv_services.setAdapter(adapter);
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
     //onCreate Completed
 
-    private void getServiceDetailsFromServer() {
+    private void getServiceDetailsFromServer()
+    {
 
         String url = AllKeys.WEBSITE + "ViewServiceMst?type=service";
         Log.d(TAG, "URL ViewServiceMst " + url);
@@ -485,7 +513,8 @@ public class AddServicesActivity extends AppCompatActivity {
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
                     if (error_status == false) {
-                        if (record_status == true) {
+                        if (record_status == true)
+                        {
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
                             sd.delete(dbhandler.TABLE_SERVICES, null, null);
                             for (int i = 0; i < arr.length(); i++) {
@@ -499,10 +528,12 @@ public class AddServicesActivity extends AppCompatActivity {
                             }
 
 
+                            FillDataOnRecyclerView();
                             hideDialog();
 
 
                         }
+
                     }
                 } catch (JSONException e) {
 

@@ -37,6 +37,7 @@ public class OrderSummaryAdapterRecyclerView extends RecyclerView.Adapter<OrderS
 
     private final dbhandler db;
     private final SQLiteDatabase sd;
+
     private Context context;
     ArrayList<OrderData> list_OrderData;
     LayoutInflater inflater;
@@ -73,6 +74,7 @@ public class OrderSummaryAdapterRecyclerView extends RecyclerView.Adapter<OrderS
         private final EditText edtRate;
         private final EditText edtDiscountAmount;
         private final EditText edtNetAmount;
+        private final EditText edtServiceDescr;
 
         public MyViewHolder(View itemView) {
 
@@ -86,6 +88,8 @@ public class OrderSummaryAdapterRecyclerView extends RecyclerView.Adapter<OrderS
             edtDiscountAmount = (EditText)itemView.findViewById(R.id.edtDiscountAmount);
             edtNetAmount = (EditText)itemView.findViewById(R.id.edtNetAmount);
             edtEmployee = (EditText)itemView.findViewById(R.id.edtEmployee);
+            edtServiceDescr = (EditText)itemView.findViewById(R.id.edtServiceDescr);
+
 
 
 
@@ -120,15 +124,26 @@ public class OrderSummaryAdapterRecyclerView extends RecyclerView.Adapter<OrderS
 
 
 
+
         holder.tvOrderID.setText("Order Id : "+od.getOrderid());
         holder.tvOrderDate.setText(od.getDate());
         holder.edtServiceName.setText(od.getServiceid());
-        holder.edtServiceQuntity.setText(od.getQuantity()+"\u20b9");
-        holder.edtRate.setText(od.getRate()+"\u20b9");
-        holder.edtDiscountAmount.setText(od.getDiscountamount()+"\u20b9");
-        holder.edtNetAmount.setText(od.getNetamount()+"\u20b9");
+        holder.edtServiceQuntity.setText("\u20b9"+od.getQuantity());
+        holder.edtRate.setText("\u20b9"+od.getRate());
+        holder.edtDiscountAmount.setText("\u20b9"+od.getDiscountamount());
+        holder.edtNetAmount.setText("\u20b9"+od.getNetamount());
         holder.edtEmployee.setText(od.getEmployeeid());
         holder.edtEmployee.setVisibility(View.GONE);
+        if(od.getDescr().toString().equals(""))
+        {
+            holder.edtServiceDescr.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.edtServiceDescr.setVisibility(View.VISIBLE);
+
+            holder.edtServiceDescr.setText(od.getDescr());
+        }
 
 
 

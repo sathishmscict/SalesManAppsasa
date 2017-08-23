@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SalesManApp</string>
+    <string name="app_name">Executive App</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -23,4 +23,10 @@
     <string name="title_activity_demo_tab">DemoTabActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_followup_response">FollowupResponseActivity</string>
+
+    <string name="no_network">Not able to connect to App</string>
+    <string name="no_network2">Please Enable Wifi or Mobile data</string>
+    <string name="no_network3">Sorry,no Internet conenctivity detected. Please reconnect and try again.</string>
+
+
 </resources>

@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
@@ -73,9 +75,12 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import dmax.dialog.SpotsDialog;
 
@@ -268,7 +273,7 @@ public class AddClientActivity extends AppCompatActivity {
         }
         else
         {
-            str_day = String.valueOf(str_day);
+            str_day = String.valueOf(day);
         }
 
         startdate = str_day + "-" + mm + "-" + year;
@@ -314,7 +319,8 @@ public class AddClientActivity extends AppCompatActivity {
             Intent ii = getIntent();
 
 
-            if (ii.getStringExtra(dbhandler.CLIENT_MOBILE1).toString().length() == 10) {
+            if (ii.getStringExtra(dbhandler.CLIENT_MOBILE1).toString().length() == 10)
+            {
                 btnSave.setText("Update data");
                 String name = ii.getStringExtra(dbhandler.CLIENT_NAME);
                 String mobile = ii.getStringExtra(dbhandler.CLIENT_MOBILE1);
@@ -367,7 +373,7 @@ public class AddClientActivity extends AppCompatActivity {
                 .resetToCorrectOrientation(true)// it will rotate the camera bitmap to the correct orientation from meta data
                 .setTakePhotoRequestCode(Camera.REQUEST_TAKE_PHOTO)
                 /*.setDirectory("BETA")*/
-                .setName("BETA" + System.currentTimeMillis())
+                .setName("Executive App" + System.currentTimeMillis())
                 .setImageFormat(Camera.IMAGE_JPEG)
                 .setCompression(50)
                 .setImageHeight(1000)// it will try to achieve this height as close as possible maintaining the aspect ratio;
@@ -426,6 +432,19 @@ public class AddClientActivity extends AppCompatActivity {
                     edtNameWrapper.setErrorEnabled(false);
                 }
 
+
+                if (edtCompanyname.getText().toString().equals("")) {
+                    isError = true;
+                    edtCompanynameWrapper.setErrorEnabled(true);
+                    edtCompanynameWrapper.setError("Enter company name");
+                } else {
+                    edtCompanynameWrapper.setErrorEnabled(false);
+                }
+
+
+
+
+
                 if (edtMobile.getText().toString().equals("")) {
                     isError = true;
                     edtMobileWrapper.setErrorEnabled(true);
@@ -442,7 +461,7 @@ public class AddClientActivity extends AppCompatActivity {
 
                 }
 
-                if (edtEmail.getText().toString().equals("")) {
+              /*  if (edtEmail.getText().toString().equals("")) {
                     isError = true;
                     edtEmailWrapper.setErrorEnabled(true);
                     edtEmailWrapper.setError("Enter Email");
@@ -457,7 +476,7 @@ public class AddClientActivity extends AppCompatActivity {
                     }
 
 
-                }
+                }*/
 
 
                 if (isError == false) {
@@ -533,7 +552,8 @@ public class AddClientActivity extends AppCompatActivity {
     }
 
 
-    private void saveData() {
+    private void saveData()
+    {
 
 
         try {
@@ -553,7 +573,7 @@ public class AddClientActivity extends AppCompatActivity {
 
 
             cv.put(dbhandler.CLIENT_NOTE, edtNote.getText().toString());
-            cv.put(dbhandler.CLIENT_SYNC_STATUS, "0");
+           // cv.put(dbhandler.SYNC_STATUS, "0");
             cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
 
 
@@ -572,7 +592,7 @@ public class AddClientActivity extends AppCompatActivity {
             if (btnSave.getText().toString().toLowerCase().equals("update data")) {
 
 
-
+                cv.put(dbhandler.SYNC_STATUS, "0");
 
                 sd.update(dbhandler.TABLE_CLIENTMASTER, cv, "" + dbhandler.CLIENT_ID + "='" + getIntent().getStringExtra(dbhandler.CLIENT_ID) + "' and " + dbhandler.CLIENT_DEVICE_TYPE + "='" + getIntent().getStringExtra(dbhandler.CLIENT_DEVICE_TYPE) + "'", null);
 
@@ -596,18 +616,20 @@ public class AddClientActivity extends AppCompatActivity {
                 Log.d("Max Id By Goal : ", "" + max_clientid);
 
 
-                cv.put(dbhandler.CLIENT_ID, "and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
+                cv.put(dbhandler.CLIENT_ID, "ANDCLIENT"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
                 cv.put(dbhandler.CLIENT_TYPE, "lead");
 
                 cv.put(dbhandler.CLIENT_VISITING_CARD_FRONT,VISITING_CARD_FRONT);
                 cv.put(dbhandler.CLIENT_VISITING_CARD_BACK,VISITING_CARD_BACK);
 
+                cv.put(dbhandler.SYNC_STATUS,"0");
                 Log.d(TAG, "Client Data : " + cv.toString());
 
                 sd.insert(dbhandler.TABLE_CLIENTMASTER, null, cv);
 
 
-                if (chkFollowUp.isChecked() == true) {
+                if (chkFollowUp.isChecked() == true)
+                {
 
                     ContentValues cv_fallow = new ContentValues();
                     cv_fallow.put(dbhandler.FOLLOWUP_DESCR, edtNote.getText().toString());
@@ -616,12 +638,152 @@ public class AddClientActivity extends AppCompatActivity {
                     cv_fallow.put(dbhandler.CLIENT_ID,"and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid );
                     cv_fallow.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                     cv_fallow.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
-
                     cv_fallow.put(dbhandler.FOLLOWUP_STATUS, AllKeys.DEAFULT);
                     cv_fallow.put(dbhandler.FOLLOWUP_REASON, "");
+                    cv_fallow.put(dbhandler.SYNC_STATUS, "0");
 
                     sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv_fallow);
                     cv_fallow.clear();
+
+
+
+                    ///Insert Data into Google Calndar
+
+                    Dexter.withActivity(AddClientActivity.this)
+                            .withPermission(Manifest.permission.WRITE_CALENDAR)
+                            .withListener(new PermissionListener()
+                            {
+                                @Override
+                                public void onPermissionGranted(PermissionGrantedResponse response) {
+                                    try {
+
+                                        int calenderId = -1;
+                                        String calenderEmaillAddress = userDetails.get(SessionManager.KEY_EMP_EMAIL);
+                                        String[] projection = new String[]{
+                                                CalendarContract.Calendars._ID,
+                                                CalendarContract.Calendars.ACCOUNT_NAME};
+                                        ContentResolver cr = context.getContentResolver();
+                                        Cursor cursor = cr.query(Uri.parse("content://com.android.calendar/calendars"), projection,
+                                                CalendarContract.Calendars.ACCOUNT_NAME + "=? and (" +
+                                                        CalendarContract.Calendars.NAME + "=? or " +
+                                                        CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + "=?)",
+                                                new String[]{calenderEmaillAddress, calenderEmaillAddress,
+                                                        calenderEmaillAddress}, null);
+
+                                        if (cursor.moveToFirst()) {
+
+                                            if (cursor.getString(1).equals(calenderEmaillAddress)) {
+
+                                                calenderId = cursor.getInt(0);
+                                            }
+                                        }
+
+
+
+
+                                        String notifytime = edtFollowupTime.getText().toString();
+                                        Log.d(TAG, "Time Before: " + notifytime);
+                                        notifytime = notifytime.replace(" ", ":");
+                                        Log.d(TAG, "Time After: " + notifytime);
+
+                                        List<String> myTimeList = new ArrayList<String>(Arrays.asList(notifytime.split(":")));
+                                        Log.d(TAG, "Time In List " + myTimeList.toString());
+
+                                        Calendar calendar = Calendar.getInstance();
+
+                                        calendar.set(Calendar.MINUTE, Integer.parseInt(myTimeList.get(1)));
+                                        Log.d(TAG, "Alaram Minute :" + Integer.parseInt(myTimeList.get(1)));
+                                        //   calendar.set(Calendar.SECOND, 00);
+                                        if (myTimeList.get(2).toLowerCase().equals("am"))
+                                        {
+
+                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                                            // calendar.set(Calendar.AM_PM,Calendar.AM);
+                                            Log.d(TAG, "Meridian AM");
+                                            Log.d(TAG, "Meridian AM " + calendar.get(Calendar.AM_PM));
+                                        } else {
+
+                                            if (Integer.parseInt(myTimeList.get(0)) == 12) {
+                                                calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                                                Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                                            } else {
+                                                calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)) + 12);
+                                                Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)) + 12);
+                                            }
+
+                                            //   calendar.set(Calendar.AM_PM,Calendar.PM);
+                                            Log.d(TAG, "Meridian PM");
+                                            Log.d(TAG, "Meridian PM " + calendar.get(Calendar.AM_PM));
+                                        }
+                                        //calendar.set(Calendar.AM_PM,calendar.get(Calendar.AM_PM));
+                                        Log.d(TAG, "Meridian AMPM " + calendar.get(Calendar.AM_PM));
+
+                                        //  alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 50000, AlarmManager.INTERVAL_DAY , pendingIntent);  //set repeating every 24 hours
+
+                                        String selected_date = edtFollowupDate.getText().toString();
+                                        Log.d(TAG, "Date Before: " + selected_date);
+
+                                        List<String> myDateList = new ArrayList<String>(Arrays.asList(selected_date.split("-")));
+                                        Log.d(TAG, "Date In List " + myDateList.toString());
+
+
+                                        calendar.set(Calendar.YEAR, Integer.parseInt(myDateList.get(2)));
+                                        int month = Integer.parseInt(myDateList.get(1));
+                                        calendar.set(Calendar.MONTH, --month);
+                                        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(myDateList.get(0)));
+
+
+
+
+                                        long start2 = calendar.getTimeInMillis(); // 2011-02-12 12h00
+                                        long end2 = calendar.getTimeInMillis() + (1 * 60 * 60 * 1000);   // 2011-02-12 13h00
+
+                                        String title = edtNote.getText().toString();
+
+                                        ContentValues cvEvent = new ContentValues();
+                                        cvEvent.put("calendar_id", calenderId);
+                                        cvEvent.put(CalendarContract.Events.TITLE, title);
+
+                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtNote.getText().toString()));
+                                        //cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
+                                        cvEvent.put("dtstart", start2);
+                                        cvEvent.put("hasAlarm", 1);
+                                        cvEvent.put("dtend", end2);
+                                        //cvEvent.put("","");
+                                        cvEvent.put("eventTimezone", TimeZone.getDefault().getID());
+
+
+                                        Uri uri = getContentResolver().insert(Uri.parse("content://com.android.calendar/events"), cvEvent);
+
+
+// get the event ID that is the last element in the Uri
+                                        long eventID = Long.parseLong(uri.getLastPathSegment());
+
+
+                                        ContentValues values = new ContentValues();
+
+                                        values.put(CalendarContract.Reminders.MINUTES, 5);
+                                        values.put(CalendarContract.Reminders.EVENT_ID, eventID);
+                                        values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALARM);
+                                        cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+                                        //Uri uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                            }).check();
+                    //Complete Insert data in google calendar
 
                     Snackbar.make(coordinatelayout, "Client details has been stored", Snackbar.LENGTH_SHORT).show();
                 }
@@ -802,7 +964,8 @@ public class AddClientActivity extends AppCompatActivity {
                                 System.out.println("NAME:" + CONTACTNAME);
 
                                 //MOBILENO = cNumber;
-                                Toast.makeText(context, "Length  : "+MOBILENO.length(),Toast.LENGTH_SHORT).show();
+                               //Toast.makeText(context, "Length  : "+MOBILENO.length(),Toast.LENGTH_SHORT).show();
+
 
 
                             }
@@ -1193,170 +1356,19 @@ public class AddClientActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }*/
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-
+        if(item.getItemId() == android.R.id.home)
+        {
             Intent intent = new Intent(context, DashBoardActivity.class);
             startActivity(intent);
             finish();
 
             overridePendingTransition(R.anim.slide_left, R.anim.slide_right);
 
-        } else if (item.getItemId() == R.id.action_sync) {
-            sendAllClientDetailsToServer();
-
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void sendAllClientDetailsToServer()
-    {
-        try {
-
-
-            showDialog();
-
-            final String url = AllKeys.WEBSITE + "InsertClient";
-
-
-            /*StringRequest req_goaldata_send = new StringRequest(StringRequest.Method.POST,
-                    str_goalDetails, new Response.Listener<String>() {*/
-                CustomRequest  request = new CustomRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
-
-                @Override
-                public void onResponse(JSONObject response) {
-
-                    Log.d(TAG, "InsertClient Res : " + response.toString());
-
-
-                    try {
-                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
-                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
-                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
-                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
-
-                        IMAGE_NAME = "";
-                        IMAGE_URL = "";
-                        if (error_status == false)
-                        {
-                            Toast.makeText(context, "Client details has been sync successfully", Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-                            Toast.makeText(context, "Sorry,try again...", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    if (pDialog.isShowing())
-                    {
-                        hideDialog();
-                    }
-
-                }
-
-
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    Log.d(TAG, "InsertClient  Error : " + error.getMessage());
-                    if (pDialog.isShowing()) {
-                        hideDialog();
-                    }
-                }
-            }) {
-
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-
-
-                    String sq = "select * from " + dbhandler.TABLE_CLIENTMASTER;
-
-
-                    Cursor cur = sd.rawQuery(sq, null);
-
-
-                    params.put("type", "insertclient");
-                    params.put("RecordType", "multiple");
-
-                    params.put("empid", userDetails.get(SessionManager.KEY_EMP_ID));
-
-                    String json = "";
-                    if (cur.getCount() > 0) {
-                        while (cur.moveToNext()) {
-
-
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.accumulate("clientid", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ID)));
-                                jsonObject.accumulate("companyname", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_COMPANYNAME))));
-                                jsonObject.accumulate("devicetype", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_DEVICE_TYPE))));
-                                jsonObject.accumulate("mobile1", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE1))));
-                                jsonObject.accumulate("mobile2", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_MOBILE2))));
-                                jsonObject.accumulate("landline", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LANDLINE))));
-                                jsonObject.accumulate("email", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_EMAIL))));
-                                jsonObject.accumulate("business", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_BUSSINESS))));
-                                jsonObject.accumulate("address", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_ADDRESS))));
-                                jsonObject.accumulate("contactperson", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NAME))));
-
-
-                             /*   jsonObject.accumulate("visitingfront", "");
-                                jsonObject.accumulate("visitingback", "");
-
-*/
-                             String v_front = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_FRONT));
-                                v_front = v_front.replace("http://crm.tech9teen.com/","");
-                                jsonObject.accumulate("visitingfront", v_front);
-
-                                String v_back = cur.getString(cur.getColumnIndex(dbhandler.CLIENT_VISITING_CARD_BACK));
-                                v_back = v_back.replace("http://crm.tech9teen.com/","");
-                                jsonObject.accumulate("visitingback", v_back);
-                                jsonObject.accumulate("createddate", cur.getString(cur.getColumnIndex(dbhandler.VISIT_DATE)));
-                                jsonObject.accumulate("latitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LATTITUDE)));
-                                jsonObject.accumulate("longitude", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_LONGTITUDE)));
-                                jsonObject.accumulate("clienttype", cur.getString(cur.getColumnIndex(dbhandler.CLIENT_TYPE)));
-                                jsonObject.accumulate("note", dbhandler.convertEncodedString(cur.getString(cur.getColumnIndex(dbhandler.CLIENT_NOTE))));
-
-
-                                jsonObject.accumulate("followupdatetime", "");
-                                jsonObject.accumulate("status", "0");
-
-
-                                json = json + jsonObject.toString() + ",";
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        json = json.substring(0, json.length() - 1);
-                        json = "[" + json + "]";
-                        Log.d("InsertClient Data : ", json);
-                        Log.d("Json Data : ", url + "?type=insertgoal&custid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&data=" + json);
-                        params.put("Data", json);
-
-
-                    }
-
-
-                    return params;
-                }
-
-            };
-
-            // Adding request to request queue
-            MyApplication.getInstance().addToRequestQueue(request);
-
-
-        } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
-        }
-
-        //Complete Sending GoalMst DEtails to server
     }
 
     private void hideDialog() {

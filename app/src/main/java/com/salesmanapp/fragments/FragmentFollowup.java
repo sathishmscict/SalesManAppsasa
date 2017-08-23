@@ -134,7 +134,7 @@ public class FragmentFollowup extends android.support.v4.app.Fragment {
     {
 
         String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + "";
-        query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID +"";
+        query = "select *,fm."+ dbhandler.CLIENT_DEVICE_TYPE +" as DevicType  from "+ dbhandler.TABLE_FOLLOWUP_MASTER +" as fm,"+ dbhandler.TABLE_CLIENTMASTER +"  as cm where cm."+ dbhandler.CLIENT_ID +" =fm."+ dbhandler.CLIENT_ID +" order by fm."+ dbhandler.FOLLOWUP_ID +" desc";
         Log.d(TAG, " Query : " + query);
 
         Cursor c = sd.rawQuery(query, null);

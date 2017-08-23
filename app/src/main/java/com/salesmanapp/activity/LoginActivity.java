@@ -198,7 +198,7 @@ public class LoginActivity extends AppCompatActivity  {
                 {
                     IsError = true;
                     edtMobileWrapper.setErrorEnabled(true);
-                    edtMobileWrapper.setError("Enter Email");
+                    edtMobileWrapper.setError("Enter Mobile no");
                 } else {
 
                     if(edtMobile.getText().toString().length() == 10)

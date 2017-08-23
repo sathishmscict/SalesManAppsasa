@@ -25,6 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -39,13 +46,20 @@ import com.salesmanapp.R;
 import com.salesmanapp.activity.FollowupResponseActivity;
 import com.salesmanapp.activity.ViewClientAndFollwupDataActivity;
 import com.salesmanapp.animation.FlipAnimation;
+import com.salesmanapp.app.MyApplication;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.helper.AllKeys;
+import com.salesmanapp.helper.NetConnectivity;
 import com.salesmanapp.pojo.FollowupData;
 import com.salesmanapp.session.SessionManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import dmax.dialog.SpotsDialog;
 
 /**
  * Created by Satish Gadde on 19-08-2016.
@@ -59,6 +73,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
     private final dbhandler db;
     private final SQLiteDatabase sd;
     private final String displayType;
+    private final SpotsDialog spotsDialog;
 
     private Context context;
     ArrayList<FollowupData> list_FollowupData;
@@ -80,10 +95,15 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         userDetails = sessionManager.getSessionDetails();
         this.activity = activity;
 
+
         db = new dbhandler(context);
         sd = db.getWritableDatabase();
 
         this.displayType = displayType;
+
+
+        spotsDialog = new SpotsDialog(context);
+        spotsDialog.setCancelable(false);
 
 
     }
@@ -182,11 +202,16 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         holder.edtScheduleReason.setText(fd.getFollowup_reason());
 
 
-        if (fd.getFollowup_reason().equals("")) {
-            holder.edtScheduleReason.setVisibility(View.GONE);
-        } else {
+        try {
+            if (fd.getFollowup_reason().isEmpty() || fd.getFollowup_reason().equals("")) {
+                holder.edtScheduleReason.setVisibility(View.GONE);
+            } else {
 
-            holder.edtScheduleReason.setVisibility(View.VISIBLE);
+                holder.edtScheduleReason.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            holder.edtScheduleReason.setVisibility(View.GONE);
         }
 
 
@@ -294,7 +319,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
                             Toast.makeText(activity, "Lattitude : " + fd.getLattitude() + " Longtitude : " + fd.getLongtitude(), Toast.LENGTH_SHORT).show();
 
-                            sessionManager.setGPSLocations("21.2049887", "72.8385114", fd.getClientname());
+                            // sessionManager.setGPSLocations("21.2049887", "72.8385114", fd.getClientname());
 
                             Intent intent = new Intent(context, ContactUsActivity.class);
                             context.startActivity(intent);
@@ -368,7 +393,7 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
 
                         //        Toast.makeText(activity, "Edited", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(context, AddFollowupActivity.class);
-                        intent.putExtra(dbhandler.FOLLOWUP_ID, Integer.parseInt(fd.getFollowupid()));
+                        intent.putExtra(dbhandler.FOLLOWUP_ID, fd.getFollowupid());
                         intent.putExtra(dbhandler.CLIENT_ID, fd.getClientid());
                         intent.putExtra(dbhandler.CLIENT_NAME, fd.getClientname());
 
@@ -401,22 +426,73 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
                     public void run() {
 
 
-                        sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, "" + dbhandler.CLIENT_ID + "='" + fd.getClientid() + "' and " + dbhandler.FOLLOWUP_ID + "=" + fd.getFollowupid() + "", null);
-
-                        Toast.makeText(activity, fd.getCompanyname() + "  has been deleted", Toast.LENGTH_SHORT).show();
-                        list_FollowupData.remove(list_FollowupData.indexOf(fd));
+                        if (NetConnectivity.isOnline(context))
+                        {
 
 
-                        notifyDataSetChanged();
+                            showDialog();
+
+                            String url_delete_followup = AllKeys.WEBSITE + "DeleteFollowupRecord?type=deletefollowup&empid=" + userDetails.get(SessionManager.KEY_EMP_ID) + "&clientid=" + fd.getClientid() + "&followupid=" + fd.getFollowupid() + "";
+                            Log.d(TAG ,  " Delete FollowupRecord : "+url_delete_followup);
+                            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url_delete_followup, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+
+                                    Log.d(TAG , "Delete Client Resposne : "+response.toString());
 
 
-                        //notifyItemRemoved();
+                                    try {
+                                        String str_error = response.getString(AllKeys.TAG_MESSAGE);
+                                        String str_error_original = response.getString(AllKeys.TAG_ERROR_ORIGINAL);
+                                        boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
+                                        boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
-                        if (list_FollowupData.size() == 0) {
-                            Toast.makeText(activity, "No data found", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(context, DashBoardActivity.class);
-                            context.startActivity(intent);
+                                        if (error_status == false) {
 
+
+                                            sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, "" + dbhandler.CLIENT_ID + "='" + fd.getClientid() + "' and " + dbhandler.FOLLOWUP_ID + "='" + fd.getFollowupid() + "'", null);
+
+                                            Toast.makeText(activity, fd.getCompanyname() + "  has been deleted", Toast.LENGTH_SHORT).show();
+                                            list_FollowupData.remove(list_FollowupData.indexOf(fd));
+
+
+                                            notifyDataSetChanged();
+
+
+                                            //notifyItemRemoved();
+                                            hideDialog();
+
+                                            if (list_FollowupData.size() == 0) {
+                                                Toast.makeText(activity, "No data found", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(context, DashBoardActivity.class);
+                                                context.startActivity(intent);
+
+
+                                            }
+
+
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        hideDialog();
+                                    }
+
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+
+                                    Toast.makeText(activity, "Errro : " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    hideDialog();
+                                }
+                            });
+                            MyApplication.getInstance().addToRequestQueue(request);
+
+
+                        } else {
+                            Toast.makeText(activity, context.getString(R.string.no_network3), Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -541,6 +617,29 @@ public class FollowupDataAdapterRecyclerView extends RecyclerView.Adapter<Follow
         });
 
 
+    }
+
+    private void hideDialog() {
+        try {
+            if (spotsDialog.isShowing()) {
+                spotsDialog.hide();
+                spotsDialog.dismiss();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showDialog() {
+        try {
+            if (!spotsDialog.isShowing()) {
+                spotsDialog.show();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

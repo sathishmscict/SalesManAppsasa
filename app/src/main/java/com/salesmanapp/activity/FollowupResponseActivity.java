@@ -339,6 +339,7 @@ public class FollowupResponseActivity extends AppCompatActivity {
                                 cv.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                                 cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
                                 cv.put(dbhandler.FOLLOWUP_REASON, "");
+                                cv.put(dbhandler.SYNC_STATUS, "0");
                                 sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv);
 
                                 Snackbar.make(coordinateLayout, "Records has been updated ", Snackbar.LENGTH_SHORT).show();

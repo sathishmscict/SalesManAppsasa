@@ -79,7 +79,7 @@ public class FragmentClients extends android.support.v4.app.Fragment {
         View rootView = inflater.inflate(R.layout.fragment_clients, container,
                 false);
 
-        if (Build.VERSION.SDK_INT > 9) {
+       if (Build.VERSION.SDK_INT > 9) {
 
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                     .permitAll().build();
@@ -138,7 +138,7 @@ public class FragmentClients extends android.support.v4.app.Fragment {
     //onCreateView Completed
     private void FillDataOnRecyclerView()
     {
-        String query = "select * from " + dbhandler.TABLE_CLIENTMASTER;
+        String query = "select * from " + dbhandler.TABLE_CLIENTMASTER+" order by "+ dbhandler.UNIQUE_ID +" desc";
         Log.d(TAG, " Query : " + query);
 
         Cursor c = sd.rawQuery(query, null);

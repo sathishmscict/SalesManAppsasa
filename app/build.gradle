@@ -76,6 +76,10 @@ dependencies {
     }
 
 
+    compile files('libs/ADT_Wifi_for_Android_Development.jar')
+
+
+
 
 
 

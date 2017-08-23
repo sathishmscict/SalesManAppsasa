@@ -7,9 +7,9 @@ package com.salesmanapp.pojo;
 public class OrderData {
 
 
-    String orderid, serviceid,quantity,rate,discountamount,netamount,cleintid,employeeid,date,devicetype;
+    String orderid, serviceid,quantity,rate,discountamount,netamount,cleintid,employeeid,date,devicetype,descr;
 
-    public OrderData(String orderid, String serviceid, String quantity, String rate, String discountamount, String netamount, String cleintid, String employeeid, String date,String devType) {
+    public OrderData(String orderid, String serviceid, String quantity, String rate, String discountamount, String netamount, String cleintid, String employeeid, String date,String devType,String descr) {
         this.orderid = orderid;
         this.serviceid = serviceid;
         this.quantity = quantity;
@@ -20,7 +20,16 @@ public class OrderData {
         this.employeeid = employeeid;
         this.date = date;
         this.devicetype =devType;
+        this.descr  = descr;
 
+    }
+
+    public String getDescr() {
+        return descr;
+    }
+
+    public void setDescr(String descr) {
+        this.descr = descr;
     }
 
     public String getDevicetype() {

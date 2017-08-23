@@ -12,14 +12,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
 
+        android:background="@color/colorPrimary"
+        android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
         android:gravity="center|left"
         android:paddingLeft="4dp"
-        android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
-        android:background="@color/colorPrimary"
 
         android:text="Service Details"
         android:textColor="@color/white" />
-
 
 
     <ScrollView
@@ -33,15 +32,13 @@
             android:orientation="vertical">
 
 
-
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="8dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
+                android:layout_marginTop="8dp"
 
                 android:orientation="horizontal">
 
@@ -63,6 +60,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:background="@color/viewbg" />
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -70,8 +68,6 @@
 
 
                 android:orientation="vertical">
-
-
 
 
                 <LinearLayout
@@ -91,10 +87,10 @@
                             android:id="@+id/edtServiceQuntity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:singleLine="true"
+                            android:hint="Quantity"
                             android:inputType="numberDecimal"
 
-                            android:hint="Quantity" />
+                            android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
 
 
@@ -108,10 +104,10 @@
                             android:id="@+id/edtRate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:singleLine="true"
+                            android:hint="Rate"
                             android:inputType="numberDecimal"
 
-                            android:hint="Rate" />
+                            android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
 
                     <android.support.design.widget.TextInputLayout
@@ -124,33 +120,50 @@
                             android:id="@+id/edtDiscountAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:singleLine="true"
+                            android:hint="Discount Amount"
                             android:inputType="numberDecimal"
-                            android:hint="Discount Amount" />
+                            android:singleLine="true" />
                     </android.support.design.widget.TextInputLayout>
-
 
 
                 </LinearLayout>
 
 
-
-
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/edtNetAmountWrapper"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
-                    android:layout_height="match_parent"
                     android:layout_weight="1">
 
                     <EditText
                         android:id="@+id/edtNetAmount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:singleLine="true"
+                        android:hint="Net Amount"
                         android:inputType="numberDecimal"
-                        android:hint="Net Amount" />
+                        android:singleLine="true" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edtDescrWrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1">
+
+                    <EditText
+                        android:id="@+id/edtDescr"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center|top|left"
+                        android:hint="Description"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:minLines="3"
+
+                        android:singleLine="true" />
                 </android.support.design.widget.TextInputLayout>
 
                 <TextView
@@ -159,16 +172,13 @@
                     android:layout_height="wrap_content"
                     android:background="@color/red"
                     android:text=""
-                    android:textColor="@color/white"
-                    />
+                    android:textColor="@color/white" />
 
                 <Button
                     android:id="@+id/btnAddService"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-
-
 
 
                     android:background="@drawable/button_shape"
@@ -180,7 +190,6 @@
 
         </LinearLayout>
     </ScrollView>
-
 
 
 </LinearLayout>
