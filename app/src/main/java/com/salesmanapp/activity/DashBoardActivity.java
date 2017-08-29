@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -148,6 +149,37 @@ public class DashBoardActivity extends AppCompatActivity
 
             }
         });
+
+
+        /**
+         * Code for send sms and automatic call permission
+         */
+/*        Dexter.withActivity(DashBoardActivity.this)
+                .withPermission(Manifest.permission.SEND_SMS)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+
+                      *//*  try {
+                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                            callIntent.setData(Uri.parse("tel:9879208321"));
+                            startActivity(callIntent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }*//*
+
+                       *//* SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage("9723613143", null, "Testing SMS", null, null);*//*
+
+
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {  }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {  }
+                }).check();*/
 
 
         db = new dbhandler(context);
@@ -1490,9 +1522,35 @@ public class DashBoardActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_import) {
 
-            getAllClientDetailsFromServer();
-            getAllClientFollowupDetailsFromServer();
-            getAllOrderOrServiceDetailsFromServer();
+
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+            builder.setTitle("Backup Info");
+            builder.setMessage("Are you sure want to import data from server.Before importing data from server you need to sync data from dashborad");
+            builder.setPositiveButton("Import", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                    dialog.cancel();
+
+                    getAllClientDetailsFromServer();
+                    getAllClientFollowupDetailsFromServer();
+                    getAllOrderOrServiceDetailsFromServer();
+
+
+                }
+            });
+            builder.setNegativeButton("Cacnel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+
+
 
 
         } else if (id == R.id.nav_clients) {
@@ -1505,6 +1563,10 @@ public class DashBoardActivity extends AppCompatActivity
            /* Intent intent = new Intent(context, CalendarDemoActivity.class);
             startActivity(intent);
             finish();*/
+           //Stop location service
+            Intent intent = new Intent(this, MyLocationService.class);
+            stopService(intent);
+
             context.deleteDatabase(dbhandler.databasename);
             sessionmanager.logoutUser();
 
@@ -1535,12 +1597,12 @@ public class DashBoardActivity extends AppCompatActivity
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
                     if (error_status == false) {
-
+                        sd.delete(dbhandler.TABLE_ORDER_MASTER, null, null);
                         if (record_status == true) {
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_ORDER_MASTER, null, null);
+
 
                             for (int i = 0; i < arr.length(); i++) {
 
@@ -1623,12 +1685,12 @@ public class DashBoardActivity extends AppCompatActivity
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
                     if (error_status == false) {
-
+                        sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, null, null);
                         if (record_status == true) {
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_FOLLOWUP_MASTER, null, null);
+
 
                             for (int i = 0; i < arr.length(); i++) {
 
@@ -1714,12 +1776,12 @@ public class DashBoardActivity extends AppCompatActivity
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
                     if (error_status == false) {
-
+                        sd.delete(dbhandler.TABLE_CLIENTMASTER, null, null);
                         if (record_status == true) {
 
 
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
-                            sd.delete(dbhandler.TABLE_CLIENTMASTER, null, null);
+
 
                             for (int i = 0; i < arr.length(); i++) {
 

@@ -11,17 +11,16 @@ public class AllKeys {
 					+ "[a-zA-Z0-9][a-zA-Z0-9-]{0,25}" + ")+");
 
 
-
-
-
-
-
-
     public static final boolean checkEmail(String email) {
 		System.out.println("Email Validation:==>" + email);
 		return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
 	}
 
+
+
+	public static final String KEYWORD_CLIENT = "ANDCLIENT";
+	public static final String KEYWORD_FOLLOWUP = "ANDFOLLOWUP";
+	public static final String KEYWORD_ORDER = "ANDORDER";
 
 	public static final String WEBSITE = "http://crm.tech9teen.com/Service.asmx/";
 	//public static final String WEBSITE = "http://arham.dnsitexperts.com/yelona/index.php/welcome/";//http://demo1.dnsitexperts.com/

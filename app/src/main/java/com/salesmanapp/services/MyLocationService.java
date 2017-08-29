@@ -416,12 +416,7 @@ public class MyLocationService extends Service implements GoogleApiClient.Connec
         Log.d(TAG, "onCreate");
 
 
-        try {
-            //startService(new Intent(this, AppUsageCheckServices.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "Error in Calling Service");
-        }
+
 
         sessionManager = new SessionManager(getApplicationContext());
 

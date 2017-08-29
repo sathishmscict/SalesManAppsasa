@@ -463,10 +463,13 @@ public class AddClientActivity extends AppCompatActivity {
             public void onClick(View v) {
                 boolean isError = false;
 
+                String errroDescr="";
+
                 if (edtName.getText().toString().equals("")) {
                     isError = true;
                     edtNameWrapper.setErrorEnabled(true);
                     edtNameWrapper.setError("Enter name");
+                    errroDescr = "Enter name";
                 } else {
                     edtNameWrapper.setErrorEnabled(false);
                 }
@@ -476,6 +479,7 @@ public class AddClientActivity extends AppCompatActivity {
                     isError = true;
                     edtCompanynameWrapper.setErrorEnabled(true);
                     edtCompanynameWrapper.setError("Enter company name");
+                    errroDescr = errroDescr+"\nEnter company name";
                 } else {
                     edtCompanynameWrapper.setErrorEnabled(false);
                 }
@@ -488,11 +492,13 @@ public class AddClientActivity extends AppCompatActivity {
                     isError = true;
                     edtMobileWrapper.setErrorEnabled(true);
                     edtMobileWrapper.setError("Enter mobile");
+                    errroDescr = errroDescr+"\nEnter mobile";
                 } else {
                     if (edtMobile.getText().toString().length() != 10) {
                         isError = true;
 
                         edtMobileWrapper.setError("Invalid mobile");
+                        errroDescr = errroDescr+"\nInvalid mobile";
                         edtMobileWrapper.setErrorEnabled(true);
                     } else {
                         edtMobileWrapper.setErrorEnabled(false);
@@ -518,7 +524,8 @@ public class AddClientActivity extends AppCompatActivity {
                 }*/
 
 
-                if (isError == false) {
+                if (isError == false)
+                {
 
                     //Ask permission and write contact to mobile no
 
@@ -545,6 +552,32 @@ public class AddClientActivity extends AppCompatActivity {
                                     Toast.makeText(context, "Try again...    ", Toast.LENGTH_SHORT).show();
                                 }
                             }).check();
+
+
+                }
+                else
+                {
+
+                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+                    builder.setTitle("Error Info");
+                    builder.setMessage(errroDescr);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+
+                            dialog.cancel();
+
+
+
+
+                        }
+                    });
+
+
+                    builder.show();
+
+
 
 
                 }
@@ -648,7 +681,8 @@ public class AddClientActivity extends AppCompatActivity {
 
                 cv.put(dbhandler.VISIT_DATE, CurrentDate);
 
-                Cursor cur_max_clientid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_CLIENTMASTER+" where "+ dbhandler.CLIENT_ID +" like '%and"+ userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
+                Cursor cur_max_clientid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_CLIENTMASTER+" where "+ dbhandler.CLIENT_ID +" like '%"+AllKeys.KEYWORD_CLIENT + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
+                Log.d(TAG , "QUERY MAX CLIENTID : "+cur_max_clientid);
 
                 //cur_max_clientid.moveToFirst();
                 int max_clientid = cur_max_clientid.getCount();
@@ -656,7 +690,7 @@ public class AddClientActivity extends AppCompatActivity {
                 Log.d("Max Id By Goal : ", "" + max_clientid);
 
 
-                cv.put(dbhandler.CLIENT_ID, "ANDCLIENT"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
+                cv.put(dbhandler.CLIENT_ID, AllKeys.KEYWORD_CLIENT+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
                 cv.put(dbhandler.CLIENT_TYPE, "lead");
 
                 cv.put(dbhandler.CLIENT_VISITING_CARD_FRONT,VISITING_CARD_FRONT);
@@ -672,16 +706,31 @@ public class AddClientActivity extends AppCompatActivity {
                 {
 
                     ContentValues cv_fallow = new ContentValues();
+
+                    String query_maxfollowupid ="SELECT * FROM " + dbhandler.TABLE_FOLLOWUP_MASTER+" where "+ dbhandler.FOLLOWUP_ID +" like '%"+AllKeys.KEYWORD_FOLLOWUP + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'";
+                    Log.d(TAG , "Query for MAX Followup ID : "+query_maxfollowupid);
+                    Cursor cur_max_followupid = sd.rawQuery(query_maxfollowupid, null);
+
+                    //cur_max_clientid.moveToFirst();
+                    int max_followupid = cur_max_followupid.getCount();
+                    ++max_followupid;
+                    Log.d("Max Id By Goal : ", "" + max_followupid);
+
+
+                    cv_fallow.put(dbhandler.FOLLOWUP_ID, AllKeys.KEYWORD_FOLLOWUP+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_followupid);
+
+
                     cv_fallow.put(dbhandler.FOLLOWUP_DESCR, edtNote.getText().toString());
                     cv_fallow.put(dbhandler.FOLLOWUP_DATE, edtFollowupDate.getText().toString());
                     cv_fallow.put(dbhandler.FOLLOWUP_TIME, edtFollowupTime.getText().toString());
-                    cv_fallow.put(dbhandler.CLIENT_ID,"and"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid );
+                    cv_fallow.put(dbhandler.CLIENT_ID,AllKeys.KEYWORD_CLIENT+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_clientid);
                     cv_fallow.put(dbhandler.EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
                     cv_fallow.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
                     cv_fallow.put(dbhandler.FOLLOWUP_STATUS, AllKeys.DEAFULT);
                     cv_fallow.put(dbhandler.FOLLOWUP_REASON, "");
                     cv_fallow.put(dbhandler.SYNC_STATUS, "0");
 
+                    Log.d(TAG , "Followup Insert Data : "+cv_fallow.toString());
                     sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv_fallow);
                     cv_fallow.clear();
 
@@ -960,56 +1009,65 @@ public class AddClientActivity extends AppCompatActivity {
             try {
 
 
+                Cursor c = null;
+                try {
+                    System.out.println("in on ActivityResult");
+                    Uri contactData = data.getData();
+                    c = managedQuery(contactData, null, null, null,
+                            null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if(c != null)
+                { if (c.moveToFirst())
+                {
+                    String id = c
+                            .getString(c
+                                    .getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                    String hasPhone = c
+                            .getString(c
+                                    .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-                        System.out.println("in on ActivityResult");
-                        Uri contactData = data.getData();
-                        Cursor c = managedQuery(contactData, null, null, null,
-                                null);
-                        if (c.moveToFirst()) {
-                            String id = c
-                                    .getString(c
-                                            .getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-                            String hasPhone = c
-                                    .getString(c
-                                            .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-                            if (hasPhone.equalsIgnoreCase("1")) {
-                                Cursor phones = getContentResolver()
-                                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                                null,
-                                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-                                                        + " = " + id, null,
-                                                null);
-                                phones.moveToFirst();
-                                MOBILENO = phones.getString(phones
-                                        .getColumnIndex("data1"));
-                                CONTACTNAME = phones
-                                        .getString(phones
-                                                .getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-
-
-                                try {
-                                    MOBILENO = MOBILENO.replace(" ","");
-                                    MOBILENO = MOBILENO.substring(MOBILENO.length()-10,MOBILENO.length());
-                                    edtName.setText(CONTACTNAME);
-                                    edtMobile.setText(MOBILENO);
-
+                    if (hasPhone.equalsIgnoreCase("1")) {
+                        Cursor phones = getContentResolver()
+                                .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                        null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+                                                + " = " + id, null,
+                                        null);
+                        phones.moveToFirst();
+                        MOBILENO = phones.getString(phones
+                                .getColumnIndex("data1"));
+                        CONTACTNAME = phones
+                                .getString(phones
+                                        .getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
 
 
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                // here you can find out all the thing.
-                                System.out.println("NAME:" + CONTACTNAME);
-
-                                //MOBILENO = cNumber;
-                               //Toast.makeText(context, "Length  : "+MOBILENO.length(),Toast.LENGTH_SHORT).show();
+                        try {
+                            MOBILENO = MOBILENO.replace(" ","");
+                            MOBILENO = MOBILENO.substring(MOBILENO.length()-10,MOBILENO.length());
+                            edtName.setText(CONTACTNAME);
+                            edtMobile.setText(MOBILENO);
 
 
 
-                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
+                        // here you can find out all the thing.
+                        System.out.println("NAME:" + CONTACTNAME);
+
+                        //MOBILENO = cNumber;
+                        //Toast.makeText(context, "Length  : "+MOBILENO.length(),Toast.LENGTH_SHORT).show();
+
+
+
+                    }
+                }
+
+                }
+
 
 
 

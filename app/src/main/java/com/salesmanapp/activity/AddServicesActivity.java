@@ -17,6 +17,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -106,314 +107,7 @@ public class AddServicesActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                final Dialog dialog = new Dialog(context);
-                dialog.setCancelable(false);
-
-
-                dialog.setContentView(R.layout.dialog_services);
-
-                TextView tvClose = (TextView) dialog.findViewById(R.id.tvClose);
-                tvClose.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        FillDataOnRecyclerView();
-                        dialog.cancel();
-                        dialog.dismiss();
-                    }
-                });
-
-                spnServices = (Spinner) dialog.findViewById(R.id.spnServices);
-
-
-                TextInputLayout edtServiceQuntityWrapper = (TextInputLayout) dialog.findViewById(R.id.edtServiceQuntityWrapper);
-                TextInputLayout edtRateWrapper = (TextInputLayout) dialog.findViewById(R.id.edtRateWrapper);
-                TextInputLayout edtDiscountAmountWrapper = (TextInputLayout) dialog.findViewById(R.id.edtDiscountAmountWrapper);
-                TextInputLayout edtNetAmountWrapper = (TextInputLayout) dialog.findViewById(R.id.edtNetAmountWrapper);
-
-
-                final EditText edtServiceQuntity = (EditText) dialog.findViewById(R.id.edtServiceQuntity);
-                final EditText edtRate = (EditText) dialog.findViewById(R.id.edtRate);
-                final EditText edtDiscountAmount = (EditText) dialog.findViewById(R.id.edtDiscountAmount);
-                final EditText edtNetAmount = (EditText) dialog.findViewById(R.id.edtNetAmount);
-                final EditText edtDescr = (EditText) dialog.findViewById(R.id.edtDescr);
-
-
-
-                final TextView tvError = (TextView) dialog.findViewById(R.id.tvError);
-                tvError.setVisibility(View.GONE);
-
-                edtServiceQuntity.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        if (!s.equals("")) {
-                            if (!edtRate.getText().toString().equals("")) {
-                                Double rate = 0.0;
-                                try {
-                                    rate = Double.parseDouble(edtRate.getText().toString());
-                                } catch (NumberFormatException e) {
-                                    e.printStackTrace();
-                                }
-                                Double qunatity = 0.0;
-                                try {
-                                    qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
-                                } catch (NumberFormatException e) {
-                                    e.printStackTrace();
-                                }
-
-                                Double discountamount = 0.0;
-                                if (!edtDiscountAmount.getText().toString().equals("")) {
-                                    discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
-
-                                }
-                                else
-                                {
-                                    discountamount=0.0;
-                                }
-
-                                Double netamount = (rate * qunatity) - discountamount;
-
-                                edtNetAmount.setText(String.valueOf(netamount));
-
-
-                            }
-
-                        } else {
-                            edtNetAmount.setText("0");
-                        }
-
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-
-                edtRate.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                        if (!s.equals("")) {
-                            if (!edtServiceQuntity.getText().toString().equals("")) {
-                                Double rate = 0.0;
-                                try {
-                                    rate = Double.parseDouble(edtRate.getText().toString());
-                                } catch (NumberFormatException e) {
-                                    e.printStackTrace();
-                                }
-                                Double qunatity = 0.0;
-                                try {
-                                    qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
-                                } catch (NumberFormatException e) {
-                                    e.printStackTrace();
-                                }
-
-                                Double discountamount = 0.0;
-                                if (!edtDiscountAmount.getText().toString().equals("")) {
-                                    try {
-                                        discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
-                                    } catch (NumberFormatException e) {
-                                        e.printStackTrace();
-
-                                    }
-
-                                }
-
-                                Double netamount = (rate * qunatity) - discountamount;
-
-
-                                edtNetAmount.setText(String.valueOf(netamount));
-                            }
-
-                        } else {
-                            edtNetAmount.setText("0");
-                        }
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-
-                edtDiscountAmount.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (!s.equals("")) {
-
-                            if (!edtServiceQuntity.getText().toString().equals("")) {
-
-
-                                Double rate = 0.0;
-                                if (!edtRate.getText().toString().equals("")) {
-                                    try {
-                                        rate = Double.parseDouble(edtRate.getText().toString());
-                                    } catch (NumberFormatException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                }
-
-
-                                Double qunatity = 0.0;
-                                if (!edtServiceQuntity.getText().toString().equals("")) {
-                                    try {
-                                        qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
-                                    } catch (NumberFormatException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                }
-
-
-                                Double discountamount = 0.0;
-                                if (!edtDiscountAmount.getText().toString().equals("")) {
-                                    try {
-                                        discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
-                                    } catch (NumberFormatException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                }
-
-                                Double netamount = (rate * qunatity) - discountamount;
-
-
-                                edtNetAmount.setText(String.valueOf(netamount));
-                            }
-                        } else {
-                            edtNetAmount.setText("0");
-                        }
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-
-
-                Button btnAddService = (Button) dialog.findViewById(R.id.btnAddService);
-
-
-                btnAddService.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        boolean isError = false;
-
-
-                        String error = "";
-                        if (spnServices.getSelectedItemPosition() == 0) {
-                            isError = true;
-                            error = "Please select service";
-
-                        }
-
-                        if (edtServiceQuntity.getText().toString().equals("")) {
-                            error = error + "\n Enter Quantity";
-                        }
-                        if (edtRate.getText().toString().equals("")) {
-                            error = error + "\n Enter Rate";
-
-
-                        }
-
-
-                        if (isError == false) {
-
-
-
-
-                            try {
-                                Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%ODRAND" + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + "%'", null);
-                                //cur_max_orderid.moveToFirst();
-                                int max_orderid = cur_max_orderid.getCount();
-                                ++max_orderid;
-                                Log.d("Max Id By OrderMst : ", "" + max_orderid);
-
-
-                                ContentValues cv = new ContentValues();
-                                cv.put(dbhandler.ORDER_ID, "ANDORDER" + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + max_orderid);
-                                cv.put(dbhandler.ORDER_SERVICEID, list_service_id.get(spnServices.getSelectedItemPosition()));
-                                cv.put(dbhandler.ORDER_QUANTITY, edtServiceQuntity.getText().toString());
-                                cv.put(dbhandler.ORDER_RATE, edtRate.getText().toString());
-
-                                Double discountamount = 0.0;
-                                if (!edtDiscountAmount.getText().toString().equals("")) {
-                                    discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
-
-                                }
-                                else
-                                {
-                                    discountamount=0.0;
-                                }
-
-
-                                cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, discountamount.intValue());
-                                cv.put(dbhandler.ORDER_NET_AMOUNT, edtNetAmount.getText().toString());
-                                cv.put(dbhandler.ORDER_CLIENT_ID, userDetails.get(SessionManager.KEY_CLIENTID));
-                                cv.put(dbhandler.ORDER_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
-                                cv.put(dbhandler.ORDER_DATE, dbhandler.getDateTime());
-                                cv.put(dbhandler.ORDER_DESCR, edtDescr.getText().toString());
-                                cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
-                                cv.put(dbhandler.SYNC_STATUS , "0");
-
-                                Log.d(TAG, "OrderMaster Insert Data : " + cv.toString());
-
-                                sd.insert(dbhandler.TABLE_ORDER_MASTER, null, cv);
-
-                                edtDiscountAmount.setText("");
-                                edtServiceQuntity.setText("");
-                                edtDescr.setText("");
-                                edtRate.setText("");
-                                edtNetAmount.setText("");
-                                spnServices.setSelection(0);
-
-                                Toast.makeText(context, "Record has been saved", Toast.LENGTH_SHORT).show();
-
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Toast.makeText(context, "Try again..." + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-
-
-                        } else {
-                            tvError.setText(error);
-                            tvError.setVisibility(View.VISIBLE);
-                        }
-
-
-                    }
-                });
-
-
-                FillDataOnspinner(true);
-
-
-                dialog.getWindow().setLayout(Toolbar.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
-                dialog.show();
+                setDialogForService(false, 0);
             }
         });
 
@@ -426,6 +120,30 @@ public class AddServicesActivity extends AppCompatActivity {
         rv_services.setLayoutManager(lManager);
 
 
+        rv_services.addOnItemTouchListener(new dbhandler.RecyclerTouchListener(context, rv_services, new dbhandler.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+                try {
+
+
+                    //Get selected service info and fill on dialog for update
+
+
+                    setDialogForService(true, position);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
 
         getServiceDetailsFromServer();
@@ -434,10 +152,346 @@ public class AddServicesActivity extends AppCompatActivity {
 
     }
 
+    private void setDialogForService(boolean IsEditRecords, final int servicePos) {
+        final Dialog dialog = new Dialog(context);
+        dialog.setCancelable(false);
+
+
+        dialog.setContentView(R.layout.dialog_services);
+
+        TextView tvClose = (TextView) dialog.findViewById(R.id.tvClose);
+        tvClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FillDataOnRecyclerView();
+                dialog.cancel();
+                dialog.dismiss();
+            }
+        });
+
+        spnServices = (Spinner) dialog.findViewById(R.id.spnServices);
+
+
+        TextInputLayout edtServiceQuntityWrapper = (TextInputLayout) dialog.findViewById(R.id.edtServiceQuntityWrapper);
+        TextInputLayout edtRateWrapper = (TextInputLayout) dialog.findViewById(R.id.edtRateWrapper);
+        TextInputLayout edtDiscountAmountWrapper = (TextInputLayout) dialog.findViewById(R.id.edtDiscountAmountWrapper);
+        TextInputLayout edtNetAmountWrapper = (TextInputLayout) dialog.findViewById(R.id.edtNetAmountWrapper);
+
+
+        final EditText edtServiceQuntity = (EditText) dialog.findViewById(R.id.edtServiceQuntity);
+        final EditText edtRate = (EditText) dialog.findViewById(R.id.edtRate);
+        final EditText edtDiscountAmount = (EditText) dialog.findViewById(R.id.edtDiscountAmount);
+        final EditText edtNetAmount = (EditText) dialog.findViewById(R.id.edtNetAmount);
+        final EditText edtDescr = (EditText) dialog.findViewById(R.id.edtDescr);
+
+
+        final TextView tvError = (TextView) dialog.findViewById(R.id.tvError);
+        tvError.setVisibility(View.GONE);
+
+
+        edtServiceQuntity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (!s.equals("")) {
+                    if (!edtRate.getText().toString().equals("")) {
+                        Double rate = 0.0;
+                        try {
+                            rate = Double.parseDouble(edtRate.getText().toString());
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                        Double qunatity = 0.0;
+                        try {
+                            qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+
+                        Double discountamount = 0.0;
+                        if (!edtDiscountAmount.getText().toString().equals("")) {
+                            discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
+
+                        } else {
+                            discountamount = 0.0;
+                        }
+
+                        Double netamount = (rate * qunatity) - discountamount;
+
+                        edtNetAmount.setText(String.valueOf(netamount));
+                        edtNetAmount.setText(String.format("%.02f", netamount));
+                        float f = 2.3455f;
+                        String test = String.format("%.02f", f);
+
+
+                    }
+
+                } else {
+                    edtNetAmount.setText("0");
+                }
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        edtRate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (!s.equals("")) {
+                    if (!edtServiceQuntity.getText().toString().equals("")) {
+                        Double rate = 0.0;
+                        try {
+                            rate = Double.parseDouble(edtRate.getText().toString());
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+                        Double qunatity = 0.0;
+                        try {
+                            qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        }
+
+                        Double discountamount = 0.0;
+                        if (!edtDiscountAmount.getText().toString().equals("")) {
+                            try {
+                                discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+
+                            }
+
+                        }
+
+                        Double netamount = (rate * qunatity) - discountamount;
+
+
+                        edtNetAmount.setText(String.valueOf(netamount));
+                        edtNetAmount.setText(String.format("%.02f", netamount));
+                    }
+
+                } else {
+                    edtNetAmount.setText("0");
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        edtDiscountAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.equals("")) {
+
+                    if (!edtServiceQuntity.getText().toString().equals("")) {
+
+
+                        Double rate = 0.0;
+                        if (!edtRate.getText().toString().equals("")) {
+                            try {
+                                rate = Double.parseDouble(edtRate.getText().toString());
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+                        Double qunatity = 0.0;
+                        if (!edtServiceQuntity.getText().toString().equals("")) {
+                            try {
+                                qunatity = Double.parseDouble(edtServiceQuntity.getText().toString());
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+
+                        Double discountamount = 0.0;
+                        if (!edtDiscountAmount.getText().toString().equals("")) {
+                            try {
+                                discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        Double netamount = (rate * qunatity) - discountamount;
+
+
+                        edtNetAmount.setText(String.valueOf(netamount));
+                        edtNetAmount.setText(String.format("%.02f", netamount));
+                    }
+                } else {
+                    edtNetAmount.setText("0");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        final Button btnAddService = (Button) dialog.findViewById(R.id.btnAddService);
+
+
+        btnAddService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean isError = false;
+
+
+                String error = "";
+                if (spnServices.getSelectedItemPosition() == 0) {
+                    isError = true;
+                    error = "Please select service";
+
+                }
+
+                if (edtServiceQuntity.getText().toString().equals("")) {
+                    error = error + "\n Enter Quantity";
+                }
+                if (edtRate.getText().toString().equals("")) {
+                    error = error + "\n Enter Rate";
+
+
+                }
+
+
+                if (isError == false) {
+
+
+                    try {
+
+
+                        ContentValues cv = new ContentValues();
+                        cv.put(dbhandler.ORDER_SERVICEID, list_service_id.get(spnServices.getSelectedItemPosition()));
+                        cv.put(dbhandler.ORDER_QUANTITY, edtServiceQuntity.getText().toString());
+                        cv.put(dbhandler.ORDER_RATE, edtRate.getText().toString());
+
+                        Double discountamount = 0.0;
+                        if (!edtDiscountAmount.getText().toString().equals("")) {
+                            discountamount = Double.parseDouble(edtDiscountAmount.getText().toString());
+
+                        } else {
+                            discountamount = 0.0;
+                        }
+
+
+                        cv.put(dbhandler.ORDER_DISCOUNT_AMOUNT, discountamount.intValue());
+                        cv.put(dbhandler.ORDER_NET_AMOUNT, edtNetAmount.getText().toString());
+                        cv.put(dbhandler.ORDER_CLIENT_ID, userDetails.get(SessionManager.KEY_CLIENTID));
+                        cv.put(dbhandler.ORDER_EMPLOYEE_ID, userDetails.get(SessionManager.KEY_EMP_ID));
+                        cv.put(dbhandler.ORDER_DATE, dbhandler.getDateTime());
+                        cv.put(dbhandler.ORDER_DESCR, edtDescr.getText().toString());
+                        cv.put(dbhandler.CLIENT_DEVICE_TYPE, "and");
+                        cv.put(dbhandler.SYNC_STATUS, "0");
+
+                        Log.d(TAG, "OrderMaster Insert Data : " + cv.toString());
+
+                        if (btnAddService.getText().toString().toLowerCase().equals("update service")) {
+
+                            sd.update(dbhandler.TABLE_ORDER_MASTER, cv, "" + dbhandler.ORDER_CLIENT_ID + "='" + userDetails.get(SessionManager.KEY_CLIENTID) + "' and " + dbhandler.ORDER_ID + "='" + listOrders.get(servicePos).getOrderid() + "'", null);
+                        } else {
+
+
+                            Cursor cur_max_orderid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.ORDER_ID + " like '%" + AllKeys.KEYWORD_ORDER + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + "%'", null);
+                            //cur_max_orderid.moveToFirst();
+                            int max_orderid = cur_max_orderid.getCount();
+                            ++max_orderid;
+                            Log.d("Max Id By OrderMst : ", "" + max_orderid);
+
+
+                            cv.put(dbhandler.ORDER_ID, AllKeys.KEYWORD_ORDER + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) + max_orderid);
+
+
+                            sd.insert(dbhandler.TABLE_ORDER_MASTER, null, cv);
+
+                        }
+
+
+                        Toast.makeText(context, "Record has been saved", Toast.LENGTH_SHORT).show();
+
+
+                        edtDiscountAmount.setText("");
+                        edtServiceQuntity.setText("");
+                        edtDescr.setText("");
+                        edtRate.setText("");
+                        edtNetAmount.setText("");
+                        spnServices.setSelection(0);
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Try again..." + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                } else {
+                    tvError.setText(error);
+                    tvError.setVisibility(View.VISIBLE);
+                }
+
+
+            }
+        });
+
+
+        FillDataOnspinner(true);
+
+        if (IsEditRecords == true) {
+
+            edtDescr.setText(listOrders.get(servicePos).getDescr());
+            edtRate.setText(listOrders.get(servicePos).getRate());
+            edtDiscountAmount.setText(listOrders.get(servicePos).getDiscountamount());
+            edtNetAmount.setText(listOrders.get(servicePos).getNetamount());
+            edtServiceQuntity.setText(listOrders.get(servicePos).getQuantity());
+            spnServices.setSelection(list_service.indexOf(listOrders.get(servicePos).getServiceid()));
+
+            btnAddService.setText("update service");
+        }
+
+        dialog.getWindow().setLayout(Toolbar.LayoutParams.FILL_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+
+    }
+
     private void FillDataOnspinner(boolean status) {
 
 
-        String query = "select * from " + dbhandler.TABLE_SERVICES + "  order by "+ dbhandler.SERVICE_NAME +"";
+        String query = "select * from " + dbhandler.TABLE_SERVICES + "  order by " + dbhandler.SERVICE_NAME + "";
         Log.d(TAG, "Query  : ");
 
         Cursor cc = sd.rawQuery(query, null);
@@ -472,7 +526,7 @@ public class AddServicesActivity extends AppCompatActivity {
 
     private void FillDataOnRecyclerView() {
         try {
-            String query = "Select * from " + dbhandler.TABLE_ORDER_MASTER + " where "+ dbhandler.CLIENT_ID +" ='"+ userDetails.get(SessionManager.KEY_CLIENTID) +"'";
+            String query = "Select * from " + dbhandler.TABLE_ORDER_MASTER + " where " + dbhandler.CLIENT_ID + " ='" + userDetails.get(SessionManager.KEY_CLIENTID) + "'";
             Log.d(TAG, "Query   : " + query);
 
             Cursor cc = sd.rawQuery(query, null);
@@ -496,8 +550,7 @@ public class AddServicesActivity extends AppCompatActivity {
     }
     //onCreate Completed
 
-    private void getServiceDetailsFromServer()
-    {
+    private void getServiceDetailsFromServer() {
 
         String url = AllKeys.WEBSITE + "ViewServiceMst?type=service";
         Log.d(TAG, "URL ViewServiceMst " + url);
@@ -513,8 +566,7 @@ public class AddServicesActivity extends AppCompatActivity {
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
                     if (error_status == false) {
-                        if (record_status == true)
-                        {
+                        if (record_status == true) {
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
                             sd.delete(dbhandler.TABLE_SERVICES, null, null);
                             for (int i = 0; i < arr.length(); i++) {

@@ -38,6 +38,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.salesmanapp.R;
 import com.salesmanapp.database.dbhandler;
+import com.salesmanapp.helper.AllKeys;
 import com.salesmanapp.session.SessionManager;
 
 import java.util.ArrayList;
@@ -219,7 +220,8 @@ public class AddFollowupActivity extends AppCompatActivity {
                     {
 
 
-                        Cursor cur_max_followupid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_FOLLOWUP_MASTER+" where "+ dbhandler.FOLLOWUP_ID +" like '%ANDFOLLOWUP"+ userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
+                        Cursor cur_max_followupid = sd.rawQuery("SELECT * FROM " + dbhandler.TABLE_FOLLOWUP_MASTER+" where "+ dbhandler.FOLLOWUP_ID +" like '%"+ AllKeys.KEYWORD_FOLLOWUP + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'", null);
+                        Log.d(TAG , "Query for MAX Followup ID : "+cur_max_followupid);
 
                         //cur_max_clientid.moveToFirst();
                         int max_followupid = cur_max_followupid.getCount();
@@ -227,7 +229,7 @@ public class AddFollowupActivity extends AppCompatActivity {
                         Log.d("Max Id By Goal : ", "" + max_followupid);
 
 
-                        cv.put(dbhandler.FOLLOWUP_ID, "ANDFOLLOWUP"+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_followupid);
+                        cv.put(dbhandler.FOLLOWUP_ID, AllKeys.KEYWORD_FOLLOWUP+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_followupid);
                         cv.put(dbhandler.CLIENT_ID, list_client_id.get(spnClients.getSelectedItemPosition()));
 
                         cv.put(dbhandler.FOLLOWUP_STATUS, "0");

@@ -150,8 +150,9 @@ public class FollowupResponseActivity extends AppCompatActivity {
                                 ContentValues cv = new ContentValues();
                                 cv.put(dbhandler.FOLLOWUP_REASON, edtCancelReason.getText().toString());
                                 cv.put(dbhandler.FOLLOWUP_STATUS, AllKeys.CANCEL);
+                                cv.put(dbhandler.SYNC_STATUS,"0");
 
-                                sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, "" + dbhandler.FOLLOWUP_ID + "=" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "", null);
+                                sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, "" + dbhandler.FOLLOWUP_ID + "='" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "'", null);
 
 
                                 Intent intent = new Intent(context, DashBoardActivity.class);
@@ -184,8 +185,9 @@ public class FollowupResponseActivity extends AppCompatActivity {
 
                     cv.put(dbhandler.FOLLOWUP_STATUS, AllKeys.YES);
                     cv.put(dbhandler.FOLLOWUP_REASON, "");
+                    cv.put(dbhandler.SYNC_STATUS,"0");
 
-                    sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, "" + dbhandler.FOLLOWUP_ID + "=" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "", null);
+                    sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, "" + dbhandler.FOLLOWUP_ID + "='" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "'", null);
 
                     Intent intent = new Intent(context, DashBoardActivity.class);
                     startActivity(intent);
@@ -212,6 +214,7 @@ public class FollowupResponseActivity extends AppCompatActivity {
                 Toast.makeText(FollowupResponseActivity.this, "Ask for reschedule and update status of current followup", Toast.LENGTH_SHORT).show();
 
 
+
                 edtNoteWrapper = (TextInputLayout) findViewById(R.id.edtNoteWrapper);
                 edtscheduleReasonWrapper = (TextInputLayout) findViewById(R.id.edtscheduleReasonWrapper);
 
@@ -235,11 +238,11 @@ public class FollowupResponseActivity extends AppCompatActivity {
                 FillDataOnSpinner();
 
                 //Get All Followup details by followupid
-                String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + " where " + dbhandler.FOLLOWUP_ID + "=" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "";
+                String query = "select * from " + dbhandler.TABLE_FOLLOWUP_MASTER + " where " + dbhandler.FOLLOWUP_ID + "='" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID) + "'";
                 Log.d(TAG, "Query : " + query);
 
 
-                Cursor cur = sd.rawQuery(query, null);
+                final Cursor cur = sd.rawQuery(query, null);
                 Log.d(TAG, "Total " + cur.getCount() + " Records found");
 
                 cur.moveToNext();
@@ -326,10 +329,26 @@ public class FollowupResponseActivity extends AppCompatActivity {
 
                                 cv.put(dbhandler.FOLLOWUP_REASON, edtSchedule.getText().toString());
                                 cv.put(dbhandler.FOLLOWUP_STATUS, AllKeys.SCHEDULE);
+                                cv.put(dbhandler.SYNC_STATUS , "0");
                                 Log.d(TAG, " Update Followup :  " + cv.toString());
-                                sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, dbhandler.FOLLOWUP_ID + "=" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID), null);
+                                sd.update(dbhandler.TABLE_FOLLOWUP_MASTER, cv, dbhandler.FOLLOWUP_ID + "='" + userDetails.get(SessionManager.KEY_FOLLOWUP_ID)+"'", null);
                                 Snackbar.make(coordinateLayout, "Records has been updated ", Snackbar.LENGTH_SHORT).show();
                                 Log.d(TAG, "Records has been updated");
+
+
+                                String query_maxfollowupid ="SELECT * FROM " + dbhandler.TABLE_FOLLOWUP_MASTER+" where "+ dbhandler.FOLLOWUP_ID +" like '%"+AllKeys.KEYWORD_FOLLOWUP + userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE) +"%'";
+                                Log.d(TAG , "Query for MAX Followup ID : "+query_maxfollowupid);
+                                Cursor cur_max_followupid = sd.rawQuery(query_maxfollowupid, null);
+
+                                //cur_max_clientid.moveToFirst();
+                                int max_followupid = cur_max_followupid.getCount();
+                                ++max_followupid;
+                                Log.d("Max Id By Followupid : ", "" + max_followupid);
+
+
+
+
+                                cv.put(dbhandler.FOLLOWUP_ID, AllKeys.KEYWORD_FOLLOWUP+userDetails.get(SessionManager.KEY_EMP_UNIQUE_CODE)+max_followupid);
 
                                 cv.put(dbhandler.FOLLOWUP_STATUS, AllKeys.DEAFULT);
                                 cv.put(dbhandler.CLIENT_ID, list_client_id.get(spnClients.getSelectedItemPosition()));
@@ -341,7 +360,7 @@ public class FollowupResponseActivity extends AppCompatActivity {
                                 cv.put(dbhandler.FOLLOWUP_REASON, "");
                                 cv.put(dbhandler.SYNC_STATUS, "0");
                                 sd.insert(dbhandler.TABLE_FOLLOWUP_MASTER, null, cv);
-
+                                Log.d(TAG, "Followup Data : "+cv.toString());
                                 Snackbar.make(coordinateLayout, "Records has been updated ", Snackbar.LENGTH_SHORT).show();
                                 Log.d(TAG, "Records has been inserted");
 
