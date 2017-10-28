@@ -345,7 +345,7 @@ public class AddFollowupActivity extends AppCompatActivity {
                                         cvEvent.put("calendar_id", calenderId);
                                         cvEvent.put(CalendarContract.Events.TITLE, title);
 
-                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtDescr.getText().toString()));
+                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(list_client.get(spnClients.getSelectedItemPosition()))+"\n"+String.valueOf(edtDescr.getText().toString()));
                                         //cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
                                         cvEvent.put("dtstart", start2);
                                         cvEvent.put("hasAlarm", 1);

@@ -1197,7 +1197,8 @@ public class DashBoardActivity extends AppCompatActivity
         }
     }
 
-    public void setupFragment(Fragment fragment, String title) {
+    public void setupFragment(Fragment fragment, String title)
+    {
         setTitle(title);
 
         if (fragment != null) {
@@ -1296,7 +1297,7 @@ public class DashBoardActivity extends AppCompatActivity
                             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                             // startService(new Intent(getBaseContext(), MyLocationService.class));
                             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                                Log.d(TAG, " Start Location updates from Background Service");
+                                Log.d(TAG, "Start Location updates from Background Service");
                                 startService(new Intent(getBaseContext(), MyLocationService.class));
 
 
@@ -1317,7 +1318,7 @@ public class DashBoardActivity extends AppCompatActivity
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setCancelable(false);
                                     builder.setTitle("Check In Information");
-                                    builder.setMessage("Location service has been started");
+                                    builder.setMessage("You have been checked in from Location : ");
                                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -1327,7 +1328,7 @@ public class DashBoardActivity extends AppCompatActivity
 
                                         }
                                     });
-                                    // builder.show();
+                                     builder.show();
 
 
                                 }
@@ -1345,7 +1346,8 @@ public class DashBoardActivity extends AppCompatActivity
                         public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
 
                         @Override
-                        public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                        public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */
+                        token.continuePermissionRequest();}
                     }).check();
 
 
@@ -1420,7 +1422,7 @@ public class DashBoardActivity extends AppCompatActivity
         action_checkin = (MenuItem) menu.findItem(R.id.action_checkin);
 
         action_sync = (MenuItem) menu.findItem(R.id.action_sync);
-        SetGpsCongiguration(true);
+        SetGpsCongiguration(false);
 
 
         return true;
@@ -1447,8 +1449,8 @@ public class DashBoardActivity extends AppCompatActivity
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setCancelable(false);
-                builder.setTitle("Check In Information");
-                builder.setMessage("Location service has been stopped");
+                builder.setTitle("Check Out Information");
+                builder.setMessage("You have been checked out from location : ");
                 builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

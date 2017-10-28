@@ -290,8 +290,10 @@ public class LoginActivity extends AppCompatActivity  {
                     boolean error_status = response.getBoolean(AllKeys.TAG_ERROR_STATUS);
                     boolean record_status = response.getBoolean(AllKeys.TAG_IS_RECORDS);
 
-                    if (error_status == false) {
-                        if (record_status == true) {
+                    if (error_status == false)
+                    {
+                        if (record_status == true)
+                        {
                             JSONArray arr = response.getJSONArray(AllKeys.ARRAY_LOGINDATA);
                             for (int i = 0; i < arr.length(); i++) {
                                 JSONObject c = arr.getJSONObject(i);
@@ -343,7 +345,7 @@ public class LoginActivity extends AppCompatActivity  {
 
                         } else {
                             hideDialog();
-                            Toast.makeText(context, "No data found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, str_error, Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
