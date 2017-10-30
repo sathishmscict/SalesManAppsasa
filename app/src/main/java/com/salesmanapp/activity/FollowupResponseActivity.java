@@ -1,14 +1,18 @@
 package com.salesmanapp.activity;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.StyleableRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -31,14 +35,23 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.salesmanapp.R;
 import com.salesmanapp.database.dbhandler;
 import com.salesmanapp.helper.AllKeys;
 import com.salesmanapp.session.SessionManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 public class FollowupResponseActivity extends AppCompatActivity {
 
@@ -325,6 +338,145 @@ public class FollowupResponseActivity extends AppCompatActivity {
 
                             if (isError == false) {
 
+
+
+                                Dexter.withActivity(FollowupResponseActivity.this)
+                                        .withPermission(Manifest.permission.WRITE_CALENDAR)
+                                        .withListener(new PermissionListener()
+                                        {
+                                            @Override
+                                            public void onPermissionGranted(PermissionGrantedResponse response) {
+                                                try {
+
+                                                    int calenderId = -1;
+                                                    String calenderEmaillAddress = userDetails.get(SessionManager.KEY_EMP_EMAIL);
+                                                    String[] projection = new String[]{
+                                                            CalendarContract.Calendars._ID,
+                                                            CalendarContract.Calendars.ACCOUNT_NAME};
+                                                    ContentResolver cr = context.getContentResolver();
+                                                    Cursor cursor = cr.query(Uri.parse("content://com.android.calendar/calendars"), projection,
+                                                            CalendarContract.Calendars.ACCOUNT_NAME + "=? and (" +
+                                                                    CalendarContract.Calendars.NAME + "=? or " +
+                                                                    CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + "=?)",
+                                                            new String[]{calenderEmaillAddress, calenderEmaillAddress,
+                                                                    calenderEmaillAddress}, null);
+
+                                                    if (cursor.moveToFirst()) {
+
+                                                        if (cursor.getString(1).equals(calenderEmaillAddress)) {
+
+                                                            calenderId = cursor.getInt(0);
+                                                        }
+                                                    }
+
+
+
+
+                                                    String notifytime = edtFollowupTime.getText().toString();
+                                                    Log.d(TAG, "Time Before: " + notifytime);
+                                                    notifytime = notifytime.replace(" ", ":");
+                                                    Log.d(TAG, "Time After: " + notifytime);
+
+                                                    List<String> myTimeList = new ArrayList<String>(Arrays.asList(notifytime.split(":")));
+                                                    Log.d(TAG, "Time In List " + myTimeList.toString());
+
+                                                    Calendar calendar = Calendar.getInstance();
+
+                                                    calendar.set(Calendar.MINUTE, Integer.parseInt(myTimeList.get(1)));
+                                                    Log.d(TAG, "Alaram Minute :" + Integer.parseInt(myTimeList.get(1)));
+                                                    //   calendar.set(Calendar.SECOND, 00);
+                                                    if (myTimeList.get(2).toLowerCase().equals("am"))
+                                                    {
+
+                                                        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                                                        Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                                                        // calendar.set(Calendar.AM_PM,Calendar.AM);
+                                                        Log.d(TAG, "Meridian AM");
+                                                        Log.d(TAG, "Meridian AM " + calendar.get(Calendar.AM_PM));
+                                                    } else {
+
+                                                        if (Integer.parseInt(myTimeList.get(0)) == 12) {
+                                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)));
+                                                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)));
+                                                        } else {
+                                                            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(myTimeList.get(0)) + 12);
+                                                            Log.d(TAG, "Alaram Hour Of Day : " + Integer.parseInt(myTimeList.get(0)) + 12);
+                                                        }
+
+                                                        //   calendar.set(Calendar.AM_PM,Calendar.PM);
+                                                        Log.d(TAG, "Meridian PM");
+                                                        Log.d(TAG, "Meridian PM " + calendar.get(Calendar.AM_PM));
+                                                    }
+                                                    //calendar.set(Calendar.AM_PM,calendar.get(Calendar.AM_PM));
+                                                    Log.d(TAG, "Meridian AMPM " + calendar.get(Calendar.AM_PM));
+
+                                                    //  alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 50000, AlarmManager.INTERVAL_DAY , pendingIntent);  //set repeating every 24 hours
+
+                                                    String selected_date = edtFollowupDate.getText().toString();
+                                                    Log.d(TAG, "Date Before: " + selected_date);
+
+                                                    List<String> myDateList = new ArrayList<String>(Arrays.asList(selected_date.split("-")));
+                                                    Log.d(TAG, "Date In List " + myDateList.toString());
+
+
+                                                    calendar.set(Calendar.YEAR, Integer.parseInt(myDateList.get(2)));
+                                                    int month = Integer.parseInt(myDateList.get(1));
+                                                    calendar.set(Calendar.MONTH, --month);
+                                                    calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(myDateList.get(0)));
+
+
+
+
+                                                    long start2 = calendar.getTimeInMillis(); // 2011-02-12 12h00
+                                                    long end2 = calendar.getTimeInMillis() + (1 * 60 * 60 * 1000);   // 2011-02-12 13h00
+
+                                                    String title = edtSchedule.getText().toString();
+
+                                                    ContentValues cvEvent = new ContentValues();
+                                                    cvEvent.put("calendar_id", calenderId);
+                                                    cvEvent.put(CalendarContract.Events.TITLE, String.valueOf(list_client.get(spnClients.getSelectedItemPosition())));
+
+                                                    cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtSchedule.getText().toString()));
+                                                    //cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
+                                                    cvEvent.put("dtstart", start2);
+                                                    cvEvent.put("hasAlarm", 1);
+                                                    cvEvent.put("dtend", end2);
+                                                    //cvEvent.put("","");
+                                                    cvEvent.put("eventTimezone", TimeZone.getDefault().getID());
+
+
+                                                    Uri uri = getContentResolver().insert(Uri.parse("content://com.android.calendar/events"), cvEvent);
+
+
+// get the event ID that is the last element in the Uri
+                                                    long eventID = Long.parseLong(uri.getLastPathSegment());
+
+
+                                                    ContentValues values = new ContentValues();
+
+                                                    values.put(CalendarContract.Reminders.MINUTES, 2);
+                                                    values.put(CalendarContract.Reminders.EVENT_ID, eventID);
+                                                    values.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALARM);
+                                                    cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+                                                    //Uri uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, values);
+
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+
+
+                                            }
+
+                                            @Override
+                                            public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+
+                                            @Override
+                                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                                        }).check();
+
+
+
                                 ContentValues cv = new ContentValues();
 
                                 cv.put(dbhandler.FOLLOWUP_REASON, edtSchedule.getText().toString());
@@ -451,7 +603,7 @@ public class FollowupResponseActivity extends AppCompatActivity {
         }
 
 
-        edtFollowupDate.setText(day + "-" + mm + "-" + year);
+        edtFollowupDate.setText(str_day + "-" + mm + "-" + year);
 
     }
 

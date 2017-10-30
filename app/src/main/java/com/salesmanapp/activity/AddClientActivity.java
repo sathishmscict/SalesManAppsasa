@@ -46,6 +46,7 @@ import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
@@ -832,9 +833,9 @@ public class AddClientActivity extends AppCompatActivity {
 
                                         ContentValues cvEvent = new ContentValues();
                                         cvEvent.put("calendar_id", calenderId);
-                                        cvEvent.put(CalendarContract.Events.TITLE, title);
+                                        cvEvent.put(CalendarContract.Events.TITLE, String.valueOf(edtCompanyname.getText().toString()));
 
-                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtCompanyname.getText().toString())+" \n"+String.valueOf(edtNote.getText().toString()));
+                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtNote.getText().toString()));
                                         //cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
                                         cvEvent.put("dtstart", start2);
                                         cvEvent.put("hasAlarm", 1);

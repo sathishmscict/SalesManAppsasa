@@ -102,6 +102,7 @@ public class AddFollowupActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.d("Error Actionbar", "" + e.getMessage());
 
+
         }
 
 
@@ -170,6 +171,7 @@ public class AddFollowupActivity extends AppCompatActivity {
                 boolean isError = false;
                 if (spnClients.getSelectedItemPosition() == 0) {
                     isError = true;
+                    Toast.makeText(context, "Please select company", Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -343,9 +345,9 @@ public class AddFollowupActivity extends AppCompatActivity {
 
                                         ContentValues cvEvent = new ContentValues();
                                         cvEvent.put("calendar_id", calenderId);
-                                        cvEvent.put(CalendarContract.Events.TITLE, title);
+                                        cvEvent.put(CalendarContract.Events.TITLE, String.valueOf(list_client.get(spnClients.getSelectedItemPosition())));
 
-                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(list_client.get(spnClients.getSelectedItemPosition()))+"\n"+String.valueOf(edtDescr.getText().toString()));
+                                        cvEvent.put(CalendarContract.Events.DESCRIPTION, String.valueOf(edtDescr.getText().toString()));
                                         //cvEvent.put(CalendarContract.Events.EVENT_LOCATION, "Bhatar,Surat");
                                         cvEvent.put("dtstart", start2);
                                         cvEvent.put("hasAlarm", 1);

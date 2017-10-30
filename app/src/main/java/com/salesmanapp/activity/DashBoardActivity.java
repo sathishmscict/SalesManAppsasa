@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -49,6 +50,8 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
@@ -67,6 +70,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.salesmanapp.BuildConfig;
 import com.salesmanapp.CalendarDemoActivity;
 import com.salesmanapp.MyFirebaseInstanceIDService;
 import com.salesmanapp.R;
@@ -220,6 +224,14 @@ public class DashBoardActivity extends AppCompatActivity
              */
 
             try {
+
+
+                Answers.getInstance().logContentView(new ContentViewEvent()
+                        .putContentName("Dashboard -  "+userDetails.get(SessionManager.KEY_EMP_ID))
+                        .putContentType("Username - "+userDetails.get(SessionManager.KEY_EMP_NAME)+" Manufacturer : "+ Build.MANUFACTURER+" Device  : "+Build.MODEL )
+                        .putContentId("Mobile - "+userDetails.get(SessionManager.KEY_EMP_MOBILE)));
+
+
                 if (getIntent().getStringExtra("ISFIRSTTIME").equals("1")) {
 
                     getAllClientDetailsFromServer();
@@ -1519,6 +1531,13 @@ public class DashBoardActivity extends AppCompatActivity
             // Handle the camera action
 
             setupFragment(new FragmentHome(), getString(R.string.app_name));
+
+           /* Intent intent = new Intent(context , ScrollingActivity.class);
+            startActivity(intent);
+            finish();*/
+
+
+
         } else if (id == R.id.nav_followup) {
             setupFragment(new FragmentFollowup(), "Follow up");
 
